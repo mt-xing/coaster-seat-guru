@@ -120,8 +120,7 @@ class Header extends HTMLElement {
 		css.textContent = `
 header {
 	width: 100%;
-	background: black;
-	color: white;
+	box-shadow: 0 5px 5px black;
 }
 
 h1 {

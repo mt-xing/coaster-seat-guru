@@ -4,3 +4,48 @@ body {
     margin: 0; padding: 0;
     font-family: 'Noto Sans', sans-serif;
 }
+
+.coaster {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.coaster p {
+    text-align: center;
+    margin: 0;
+}
+
+.coasterTrain {
+    border-spacing: 5px;
+}
+
+.coasterTrain td {
+    background: gray;
+    width: 30px;
+    height: 30px;
+}
+
+.coasterTrain td:first-child {
+    background: initial;
+    width: initial;
+    height: initial;
+}
+
+.bigBtn {
+    border: 2px black solid;
+    text-decoration: none;
+    background: white;
+    color: black;
+    padding: 10px 15px;
+    box-shadow: 0 0 5px black;
+
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+.bigBtn:hover, .bigBtn:focus {
+    box-shadow: 0 0 15px black;
+}
+
+.bigBtn:active {
+    box-shadow: 0 0 5px blue;
+}
