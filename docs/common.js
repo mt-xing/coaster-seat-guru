@@ -6,30 +6,7 @@ class ProductName extends HTMLElement {
 		this.attachShadow({ mode: 'closed' }).appendChild(document.createTextNode(PRODUCT_NAME));
 	}
 }
-
-class Header extends HTMLElement {
-	constructor() {
-		super();
-
-		const shadow = this.attachShadow({ mode: 'closed' });
-		const css = shadow.appendChild(document.createElement('style'));
-		css.textContent = `
-header {
-	width: 100%;
-	background: black;
-	color: white;
-}
-
-h1 {
-	margin: 0;
-}
-		`;
-
-		const header = shadow.appendChild(document.createElement('header'));
-		const h1 = header.appendChild(document.createElement('h1'));
-		h1.textContent = PRODUCT_NAME;
-	}
-}
+customElements.define('prod-name', ProductName);
 
 class Search extends HTMLElement {
 	/** @type {HTMLInputElement} */
@@ -132,7 +109,30 @@ class Search extends HTMLElement {
 		s.textContent = sub;
 	}
 }
-
-customElements.define('prod-name', ProductName);
-customElements.define('csg-header', Header);
 customElements.define('csg-search', Search);
+
+class Header extends HTMLElement {
+	constructor() {
+		super();
+
+		const shadow = this.attachShadow({ mode: 'closed' });
+		const css = shadow.appendChild(document.createElement('style'));
+		css.textContent = `
+header {
+	width: 100%;
+	background: black;
+	color: white;
+}
+
+h1 {
+	margin: 0;
+}
+		`;
+
+		const header = shadow.appendChild(document.createElement('header'));
+		const h1 = header.appendChild(document.createElement('h1'));
+		h1.textContent = PRODUCT_NAME;
+		header.appendChild(document.createElement('csg-search'));
+	}
+}
+customElements.define('csg-header', Header);
