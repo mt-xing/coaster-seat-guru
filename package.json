@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Seat Guru, but for roller coasters",
   "scripts": {
-    "start": "http-server . -p 3000"
+    "start": "http-server ./docs -p 3000"
   },
   "author": "mt-xing",
   "devDependencies": {
