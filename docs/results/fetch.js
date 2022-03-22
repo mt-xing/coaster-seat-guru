@@ -4,16 +4,19 @@ window.onload = () => {
 		notFound();
 		return;
 	}
-	// TODO
-	populate(
-		3,
-		'Fury 325',
-		'Carowinds',
-		8,
-		4,
-		[[[6, 2, 1], [6, 1, 1], [6, 0, 1], [6, 3, 1]], [[2, 2, 1], [2, 1, 1], [3, 0, 1], [2, 3, 1]]],
-		10,
-	);
+
+	const f = async () => {
+		const endpoint = `https://coasterseatguru.azurewebsites.net/api/GetCoaster?id=${id}`;
+		const result = await fetch(endpoint);
+		if (!result.ok) {
+			notFound();
+			return;
+		}
+		const r = await result.json();
+		console.log(r);
+		populate(r.id, r.name, r.park, r.rows, r.cols, r.data, r.total);
+	};
+	f();
 };
 
 function notFound() {
@@ -72,7 +75,7 @@ function populate(id, name, park, rows, cols, data, total) {
 	finalLink.textContent = 'Vote on your favorite seats';
 
 	// Compute the colors
-	const minmax = [0, 0];
+	const minmax = [-1, 1];
 	data.forEach((row, r) => {
 		row.forEach((col, c) => {
 			const v = data[r][c];
@@ -101,9 +104,9 @@ function populate(id, name, park, rows, cols, data, total) {
 		if (ratings.length !== d.length) { return; }
 		ratings.forEach((x, i) => {
 			// eslint-disable-next-line no-param-reassign, no-mixed-operators
-			x.span.style.width = `${d[i] / max * 100 / 2}%`;
+			x.span.style.width = `${max === 0 ? 0 : (d[i] / max * 100 / 2)}%`;
 			// eslint-disable-next-line no-param-reassign, no-mixed-operators
-			x.txt.textContent = `${Math.round(d[i] / voteTotal * 100)}% (${d[i]})`;
+			x.txt.textContent = `${max === 0 ? 0 : (Math.round(d[i] / voteTotal * 100))}% (${d[i]})`;
 		});
 
 		infoHeader.textContent = `Row ${r + 1} — Seat ${c + 1}`;
@@ -123,13 +126,13 @@ function populate(id, name, park, rows, cols, data, total) {
 				const val = d[0] * 3 + d[1] - d[2] * 3;
 				btn.style.background = val > 0 ? 'rgb(' : '';
 				if (val >= 0) {
-				// eslint-disable-next-line no-mixed-operators
+					// eslint-disable-next-line no-mixed-operators
 					const g = val / minmax[1] * 128 + 128;
 					const o = 256 - g;
 					btn.style.background = `rgb(${o}, ${g}, ${o})`;
 				} else {
-				// eslint-disable-next-line no-mixed-operators
-					const g = val / minmax[0] * 128;
+					// eslint-disable-next-line no-mixed-operators
+					const g = val / minmax[0] * 128 + 128;
 					const o = 256 - g;
 					btn.style.background = `rgb(${g}, ${o}, ${o})`;
 				}
