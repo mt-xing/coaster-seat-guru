@@ -13,13 +13,46 @@ const frag = React.Fragment;
 const useState = React.useState;
 
 function Contribution() {
-	const [ready, setReady] = useState(true);
+	const [state, setState] = useState(/** @type {'ready' | 'signin' | 'load'} */('signin'));
 	const [step, setStep] = useState(/** @type {1|2|3} */(1));
 	const numRows = Array.from(Array(8).keys());
 	const numCols = Array.from(Array(4).keys());
 	const [selected, setSelected] = useState(
 		numRows.map((r) => numCols.map(/** @return {number | undefined} */() => undefined)),
 	);
+
+	// @ts-ignore
+	// eslint-disable-next-line no-undef
+	React.useEffect(() => {
+		switch (state) {
+		case 'signin': {
+			/** @param {Record<string, unknown>} response */
+			const handleCredentialResponse = (response) => {
+				const token = response.credential;
+				setState('load');
+			};
+			// @ts-ignore
+			// eslint-disable-next-line no-undef
+			google.accounts.id.initialize({
+				client_id: '576763212029-fsd49s3dgcnmrpm2rcgovfkvlkhp8ube.apps.googleusercontent.com',
+				callback: handleCredentialResponse,
+			});
+			// @ts-ignore
+			// eslint-disable-next-line no-undef
+			google.accounts.id.renderButton(
+				document.getElementById('gbuttonDiv'),
+				{ theme: 'outline', size: 'large' }, // customization attributes
+			);
+			break;
+		}
+		case 'load': {
+			// TODO
+			window.setTimeout(() => setState('ready'), 1000);
+			break;
+		}
+		default: return;
+		}
+	}, [state]);
 
 	/**
      * @param {number} r
@@ -33,8 +66,18 @@ function Contribution() {
 		setSelected(t);
 	}
 
-	if (!ready) {
-		return e('p', null, 'Loading');
+	if (state === 'signin') {
+		return e(
+			'div',
+			{ className: 'signIn' },
+			e('h1', null, 'Sign In'),
+			e('div', { id: 'gbuttonDiv', className: 'signInBtn' }),
+			e('p', null, 'This is my attempt to stop the same person from spamming the multiple reviews on the same ride. I don\'t track anything from your Google account. If you have a better idea for how to do this, suggestions are welcome.'),
+		);
+	}
+
+	if (state === 'load') {
+		return e('p', null, 'Loading...');
 	}
 
 	/** @type {[string, string]} */

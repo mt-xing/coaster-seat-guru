@@ -2,6 +2,16 @@ body {
     text-align: center;
 }
 
+.signInBtn {
+    display: inline-block;
+    margin: 20px auto;
+}
+
+.signIn p {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
 .instr {
     display: inline-block;
     margin-left: 50px;
