@@ -38,11 +38,11 @@ class Search extends HTMLElement {
 		this.#resultsWrapper = shadow.appendChild(document.createElement('div'));
 		this.#results = this.#resultsWrapper.appendChild(document.createElement('ul'));
 		const source = this.#resultsWrapper.appendChild(document.createElement('p'));
-		source.textContent = 'Results courtesy of ';
+		source.textContent = 'Don\'t see a coaster? ';
 		const sourceLink = source.appendChild(document.createElement('a'));
-		sourceLink.href = 'https://rcdb.com/';
+		sourceLink.href = '/contribute/newCoaster.html';
 		sourceLink.rel = 'noreferrer';
-		sourceLink.textContent = 'RCDB';
+		sourceLink.textContent = 'Add it!';
 	}
 
 	#changedSearch() {
@@ -140,11 +140,17 @@ div {
 	margin-left: auto;
 	margin-right: 20px;
 }
+
+a {
+	text-decoration: none;
+	color: black;
+}
 		`;
 
 		const header = shadow.appendChild(document.createElement('header'));
-		const h1 = header.appendChild(document.createElement('h1'));
-		h1.textContent = PRODUCT_NAME;
+		const a = header.appendChild(document.createElement('h1')).appendChild(document.createElement('a'));
+		a.textContent = PRODUCT_NAME;
+		a.href = '/';
 		const searchWrap = header.appendChild(document.createElement('div'));
 		searchWrap.appendChild(document.createElement('csg-search'));
 	}
