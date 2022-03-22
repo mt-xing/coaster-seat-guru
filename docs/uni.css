@@ -60,7 +60,7 @@ h1 + h2 {
     cursor: pointer;
 
     box-shadow: 0 0 5px black;
-    transition: box-shadow 0.2s ease-in-out;
+    transition: box-shadow 0.2s ease-in-out, color 0.5s ease-in-out, background 0.5s ease-in-out;
 }
 
 .bigBtn:hover, .bigBtn:focus {
@@ -69,4 +69,11 @@ h1 + h2 {
 
 .bigBtn:active {
     box-shadow: 0 0 5px blue;
+}
+
+.bigBtn.disabled {
+    background: black;
+    color: white;
+    box-shadow: 0 0 5px black;
+    cursor: not-allowed;
 }
