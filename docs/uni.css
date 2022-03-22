@@ -35,12 +35,24 @@ h1 + h2 {
     overflow: hidden;
 }
 
-.coasterTrain input[type="checkbox"] {
+.coasterTrain input[type="checkbox"], .coasterTrain button {
     width: 30px;
     height: 30px;
     margin: 0;
     vertical-align: middle;
     cursor: pointer;
+}
+
+.coasterTrain button {
+    border: none;
+}
+
+.coasterTrain button:hover, .coasterTrain button:focus {
+    box-shadow: 0 0 1px black;
+}
+
+.coasterTrain button:active {
+    box-shadow: none;
 }
 
 .coasterTrain td:first-child {

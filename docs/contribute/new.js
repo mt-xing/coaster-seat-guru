@@ -83,7 +83,7 @@ function Contribution() {
 			{ className: 'signIn' },
 			e('h1', null, 'Sign In'),
 			e('div', { id: 'gbuttonDiv', className: 'signInBtn' }),
-			e('p', null, 'This is my attempt to stop the same person from spamming the multiple reviews on the same ride. I don\'t track anything from your Google account. If you have a better idea for how to do this, suggestions are welcome.'),
+			e('p', null, 'This is my attempt to stop the same person from spamming multiple reviews on the same ride. I don\'t track anything from your Google account. If you have a better idea for how to do this, suggestions are welcome.'),
 		);
 	}
 
