@@ -5,6 +5,15 @@ body {
     font-family: 'Noto Sans', sans-serif;
 }
 
+h1 {
+    font-size: 300%;
+    margin-bottom: 0;
+}
+
+h1 + h2 {
+    margin-top: 0;
+}
+
 .coaster {
     display: inline-block;
     vertical-align: top;
@@ -20,15 +29,26 @@ body {
 }
 
 .coasterTrain td {
-    background: gray;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    overflow: hidden;
+}
+
+.coasterTrain input[type="checkbox"] {
     width: 30px;
     height: 30px;
+    margin: 0;
+    vertical-align: middle;
+    cursor: pointer;
 }
 
 .coasterTrain td:first-child {
     background: initial;
     width: initial;
     height: initial;
+    font-size: 20px;
+    line-height: 30px;
 }
 
 .bigBtn {
@@ -37,8 +57,9 @@ body {
     background: white;
     color: black;
     padding: 10px 15px;
-    box-shadow: 0 0 5px black;
+    cursor: pointer;
 
+    box-shadow: 0 0 5px black;
     transition: box-shadow 0.2s ease-in-out;
 }
 

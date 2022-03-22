@@ -28,7 +28,7 @@ class Search extends HTMLElement {
 		const css = shadow.appendChild(document.createElement('link'));
 		css.rel = 'stylesheet';
 		css.type = 'text/css';
-		css.href = '/css/search.css';
+		css.href = '/search.css';
 
 		this.#input = shadow.appendChild(document.createElement('input'));
 		this.#input.type = 'text';
@@ -121,17 +121,32 @@ class Header extends HTMLElement {
 header {
 	width: 100%;
 	box-shadow: 0 5px 5px black;
+	text-align: left;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
 }
 
 h1 {
-	margin: 0;
+	margin: 15px 30px;
+	font-size: 35px;
+	display: inline-block;
+}
+
+div {
+	display: inline-block;
+	float: right;
+	border: 1px black solid;
+	margin-left: auto;
+	margin-right: 20px;
 }
 		`;
 
 		const header = shadow.appendChild(document.createElement('header'));
 		const h1 = header.appendChild(document.createElement('h1'));
 		h1.textContent = PRODUCT_NAME;
-		header.appendChild(document.createElement('csg-search'));
+		const searchWrap = header.appendChild(document.createElement('div'));
+		searchWrap.appendChild(document.createElement('csg-search'));
 	}
 }
 customElements.define('csg-header', Header);
