@@ -111,6 +111,7 @@ function Contribution() {
 		}))),
 		e('p', null, 'My site currently only supports rectangular layouts. If a train has a more esoteric design, please let me know.'),
 		e('p', null, e('button', { className: ready ? 'bigBtn' : 'bigBtn disabled' }, 'Submit')),
+		// TODO
 	);
 }
 

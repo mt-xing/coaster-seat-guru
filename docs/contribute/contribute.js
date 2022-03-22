@@ -157,6 +157,7 @@ function Contribution() {
 				// @ts-ignore
 				step !== 3 ? e('button', { className: 'bigBtn', onClick: () => setStep(step + 1) }, 'Next') : null,
 				step === 3 ? e('button', { className: 'bigBtn' }, 'Submit') : null,
+				// TODO
 			),
 		),
 	);
