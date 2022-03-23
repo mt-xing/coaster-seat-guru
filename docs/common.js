@@ -145,6 +145,11 @@ header {
 	align-items: center;
 }
 
+img {
+	height: 35px;
+	margin-right: 10px;
+}
+
 h1 {
 	margin: 15px 30px;
 	font-size: 35px;
@@ -167,7 +172,10 @@ a {
 
 		const header = shadow.appendChild(document.createElement('header'));
 		const a = header.appendChild(document.createElement('h1')).appendChild(document.createElement('a'));
-		a.textContent = PRODUCT_NAME;
+		const img = a.appendChild(document.createElement('img'));
+		img.src = '/img/icon.png';
+		img.alt = '';
+		a.appendChild(document.createTextNode(PRODUCT_NAME));
 		a.href = '/';
 		const searchWrap = header.appendChild(document.createElement('div'));
 		searchWrap.appendChild(document.createElement('csg-search'));

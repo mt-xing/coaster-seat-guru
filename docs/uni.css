@@ -89,3 +89,11 @@ h1 + h2 {
     box-shadow: 0 0 5px black;
     cursor: not-allowed;
 }
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    text-align: left;
+    font-size: 80%;
+}
