@@ -13,6 +13,15 @@
       "type": "http",
       "direction": "out",
       "name": "res"
+    },
+    {
+      "type": "cosmosDB",
+      "direction": "in",
+      "name": "inputDocument",
+      "databaseName": "csg",
+      "collectionName": "Coasters",
+      "connectionStringSetting": "CosmosDbConnectionString",
+      "sqlQuery": "SELECT * FROM c WHERE CONTAINS(c.searchName, {q})"
     }
   ]
 }
