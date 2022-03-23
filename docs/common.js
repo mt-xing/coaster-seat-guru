@@ -168,6 +168,23 @@ a {
 	text-decoration: none;
 	color: black;
 }
+
+@media(max-width: 950px) {
+	header {
+		flex-direction: column;
+	}
+
+	h1 {
+		display: block;
+		text-align: center;
+	}
+
+	div {
+		display: inline-block;
+		float: initial;
+		margin: 0 auto;
+	}
+}
 		`;
 
 		const header = shadow.appendChild(document.createElement('header'));
