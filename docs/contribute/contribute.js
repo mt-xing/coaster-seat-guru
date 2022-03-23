@@ -123,7 +123,16 @@ function Contribution() {
 		return e('h1', null, 'Coaster not found :(');
 	case 'ready': break;
 	case 'done':
-		return e('h1', null, 'Thank You!');
+		return e(
+			frag,
+			null,
+			e('h1', null, 'Thank You!'),
+			e(
+				'p',
+				null,
+				e('a', { href: `/results?id=${id}`, className: 'bigBtn' }, 'Return to coaster'),
+			),
+		);
 	default: (/** @param {never} x */(x) => { throw new Error(x); })(state);
 	}
 
