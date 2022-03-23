@@ -54,6 +54,7 @@ function Contribution() {
 	}, [setRows]);
 
 	async function submit() {
+		if (submitting) { return; }
 		setSubmitting(true);
 		const rcdbMatch = /http(?:s?):\/\/rcdb.com\/([\d]+)\.htm/.exec(rcdb);
 		if (rcdbMatch === null) {

@@ -40,6 +40,7 @@ function Contribution() {
 	const [state, setState] = useState(/** @type {State} */({ s: 'signin' }));
 	const [step, setStep] = useState(/** @type {1|2|3} */(1));
 	const id = new URLSearchParams(window.location.search).get('id');
+	const [submitting, setSubmitting] = useState(false);
 
 	// @ts-ignore
 	// eslint-disable-next-line no-undef
@@ -128,6 +129,8 @@ function Contribution() {
 
 	async function submit() {
 		if (state.s !== 'ready') { return; }
+		if (submitting) { return; }
+		setSubmitting(true);
 		const r = await fetch(`https://coasterseatguru.azurewebsites.net/api/Vote?id=${id}&uid=${parseJwtSub(state.token)}`, {
 			method: 'POST',
 			body: JSON.stringify({
@@ -218,7 +221,7 @@ function Contribution() {
 				' ',
 				// @ts-ignore
 				step !== 3 ? e('button', { className: 'bigBtn', onClick: () => setStep(step + 1) }, 'Next') : null,
-				step === 3 ? e('button', { className: 'bigBtn', onClick: submit }, 'Submit') : null,
+				step === 3 ? e('button', { className: !submitting ? 'bigBtn' : 'bigBtn disabled', onClick: submit }, 'Submit') : null,
 			),
 		),
 	);
