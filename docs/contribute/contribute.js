@@ -12,24 +12,31 @@ const frag = React.Fragment;
 // eslint-disable-next-line no-undef, prefer-destructuring
 const useState = React.useState;
 
+/**
+@typedef {{s: 'signin'} | {s: 'load', token: string} | {
+	s: 'ready',
+	token: string,
+	name: string,
+	park: string,
+	rows: number,
+	cols: number,
+	selected: (number | undefined)[][]
+} | {s: '404'}} State
+*/
+
 function Contribution() {
-	const [state, setState] = useState(/** @type {'ready' | 'signin' | 'load'} */('signin'));
+	const [state, setState] = useState(/** @type {State} */({ s: 'signin' }));
 	const [step, setStep] = useState(/** @type {1|2|3} */(1));
-	const numRows = Array.from(Array(8).keys());
-	const numCols = Array.from(Array(4).keys());
-	const [selected, setSelected] = useState(
-		numRows.map((r) => numCols.map(/** @return {number | undefined} */() => undefined)),
-	);
 
 	// @ts-ignore
 	// eslint-disable-next-line no-undef
 	React.useEffect(() => {
-		switch (state) {
+		switch (state.s) {
 		case 'signin': {
 			/** @param {Record<string, unknown>} response */
 			const handleCredentialResponse = (response) => {
-				const token = response.credential;
-				setState('load');
+				const token = /** @type {string} */(response.credential);
+				setState({ s: 'load', token });
 			};
 			// @ts-ignore
 			// eslint-disable-next-line no-undef
@@ -46,8 +53,28 @@ function Contribution() {
 			break;
 		}
 		case 'load': {
-			// TODO
-			window.setTimeout(() => setState('ready'), 1000);
+			const f = async () => {
+				const endpoint = `https://coasterseatguru.azurewebsites.net/api/GetCoaster?id=${new URLSearchParams(window.location.search).get('id')}`;
+				const result = await fetch(endpoint);
+				if (!result.ok) {
+					setState({ s: '404' });
+					return;
+				}
+				const r = await result.json();
+				console.log(r);
+				const numRows = Array.from(Array(r.rows).keys());
+				const numCols = Array.from(Array(r.cols).keys());
+				setState({
+					s: 'ready',
+					token: state.token,
+					name: r.name,
+					park: r.park,
+					rows: r.rows,
+					cols: r.cols,
+					selected: numRows.map((_r) => numCols.map(() => undefined)),
+				});
+			};
+			f();
 			break;
 		}
 		default: return;
@@ -60,13 +87,15 @@ function Contribution() {
      * @param {number | undefined} val
      */
 	function changeSelected(r, c, val) {
-		const t = selected.slice();
-		t[r] = selected[r].slice();
+		if (state.s !== 'ready') { throw new Error(); }
+		const t = state.selected.slice();
+		t[r] = state.selected[r].slice();
 		t[r][c] = val;
-		setSelected(t);
+		setState({ ...state, selected: t });
 	}
 
-	if (state === 'signin') {
+	switch (state.s) {
+	case 'signin':
 		return e(
 			'div',
 			{ className: 'signIn' },
@@ -74,10 +103,12 @@ function Contribution() {
 			e('div', { id: 'gbuttonDiv', className: 'signInBtn' }),
 			e('p', null, 'This is my attempt to stop the same person from spamming multiple reviews on the same ride. I don\'t track anything from your Google account. If you have a better idea for how to do this, suggestions are welcome.'),
 		);
-	}
-
-	if (state === 'load') {
+	case 'load':
 		return e('p', null, 'Loading...');
+	case '404':
+		return e('h1', null, 'Coaster not found :(');
+	case 'ready': break;
+	default: (/** @param {never} x */(x) => { throw new Error(x); })(state);
 	}
 
 	/** @type {[string, string]} */
@@ -94,11 +125,13 @@ function Contribution() {
 		}
 	})();
 
+	const numRows = Array.from(Array(state.rows).keys());
+	const numCols = Array.from(Array(state.cols).keys());
 	return e(
 		frag,
 		null,
-		e('h1', null, 'Fury 325'),
-		e('h2', null, 'Carowinds'),
+		e('h1', null, state.name),
+		e('h2', null, state.park),
 		e(
 			'section',
 			{ className: 'coaster' },
@@ -113,17 +146,17 @@ function Contribution() {
 					...numCols.map((c) => e(
 						'td',
 						{ key: c },
-						selected[r][c] === undefined || selected[r][c] === step ? e(
+						state.selected[r][c] === undefined || state.selected[r][c] === step ? e(
 							'input',
 							{
 								type: 'checkbox',
-								checked: selected[r][c] === step,
+								checked: state.selected[r][c] === step,
 								onChange: (/** @type {{ target: { checked: boolean; }; }} */ v) =>
 									// eslint-disable-next-line implicit-arrow-linebreak
 									changeSelected(r, c, v.target.checked ? step : undefined),
 							},
 						) : (() => {
-							switch (selected[r][c]) {
+							switch (state.selected[r][c]) {
 							case 1:
 								return '🟢';
 							case 2:
