@@ -75,10 +75,9 @@ function populate(id, name, park, rows, cols, data, total) {
 	finalLink.textContent = 'Vote on your favorite seats';
 
 	// Compute the colors
-	const minmax = [-1, 1];
-	data.forEach((row, r) => {
-		row.forEach((col, c) => {
-			const v = data[r][c];
+	const minmax = [-3, 3];
+	data.forEach((row) => {
+		row.forEach((v) => {
 			const rr = v[0] * 3 + v[1] - v[2] * 3;
 			if (rr < minmax[0]) {
 				minmax[0] = rr;
