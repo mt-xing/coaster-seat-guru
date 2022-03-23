@@ -26,6 +26,7 @@
         "no-await-in-loop": "off",
         "import/extensions": ["error", { "js": "always" }],
         "no-else-return": "off",
-        "no-continue": "off"
+        "no-continue": "off",
+        "func-names": "off"
     }
 }
