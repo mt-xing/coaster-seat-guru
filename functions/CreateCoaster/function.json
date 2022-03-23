@@ -22,6 +22,16 @@
       "collectionName": "Coasters",
       "createIfNotExists": false,
       "connectionStringSetting": "CosmosDbConnectionString"
+    },
+    {
+      "type": "cosmosDB",
+      "direction": "in",
+      "name": "inputDocument",
+      "databaseName": "csg",
+      "collectionName": "Coasters",
+      "connectionStringSetting": "CosmosDbConnectionString",
+      "id": "{Query.id}",
+      "partitionKey": "{Query.id}"
     }
   ]
 }

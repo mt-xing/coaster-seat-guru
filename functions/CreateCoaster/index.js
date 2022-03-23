@@ -10,7 +10,7 @@ async function verify(token) {
 	return true;
 }
 
-module.exports = async function (context, req) {
+module.exports = async function (context, req, inputDocument) {
 	context.log('Adding a coaster');
 	if (!req.body) {
 		context.res = { status: 401 };
@@ -36,6 +36,14 @@ module.exports = async function (context, req) {
 	}
 
 	const id = rcdbMatch[1];
+	if (id !== req.query.id) {
+		context.res = { status: 400 };
+		return;
+	}
+	if (inputDocument) {
+		context.res = { status: 409 };
+		return;
+	}
 	const { name, park } = req.body;
 	const rows = parseInt(req.body.rows, 10);
 	const cols = parseInt(req.body.cols, 10);
@@ -48,6 +56,7 @@ module.exports = async function (context, req) {
 	context.bindings.outputDocument = JSON.stringify({
 		id,
 		name,
+		searchName: name.replace(/[\W_]+/g, '').toLowerCase(),
 		park,
 		rows,
 		cols,
