@@ -13,6 +13,18 @@ const frag = React.Fragment;
 const useState = React.useState;
 
 /**
+ * @param {string} token
+ * @returns {string}
+ */
+function parseJwtSub(token) {
+	const base64Url = token.split('.')[1];
+	const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+	const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => `%${(`00${c.charCodeAt(0).toString(16)}`).slice(-2)}`).join(''));
+
+	return JSON.parse(jsonPayload).sub;
+}
+
+/**
 @typedef {{s: 'signin'} | {s: 'load', token: string} | {
 	s: 'ready',
 	token: string,
@@ -21,12 +33,13 @@ const useState = React.useState;
 	rows: number,
 	cols: number,
 	selected: (number | undefined)[][]
-} | {s: '404'}} State
+} | {s: '404'} | {s: 'done'}} State
 */
 
 function Contribution() {
 	const [state, setState] = useState(/** @type {State} */({ s: 'signin' }));
 	const [step, setStep] = useState(/** @type {1|2|3} */(1));
+	const id = new URLSearchParams(window.location.search).get('id');
 
 	// @ts-ignore
 	// eslint-disable-next-line no-undef
@@ -54,7 +67,7 @@ function Contribution() {
 		}
 		case 'load': {
 			const f = async () => {
-				const endpoint = `https://coasterseatguru.azurewebsites.net/api/GetCoaster?id=${new URLSearchParams(window.location.search).get('id')}`;
+				const endpoint = `https://coasterseatguru.azurewebsites.net/api/GetCoaster?id=${id}`;
 				const result = await fetch(endpoint);
 				if (!result.ok) {
 					setState({ s: '404' });
@@ -108,7 +121,23 @@ function Contribution() {
 	case '404':
 		return e('h1', null, 'Coaster not found :(');
 	case 'ready': break;
+	case 'done':
+		return e('h1', null, 'Thank You!');
 	default: (/** @param {never} x */(x) => { throw new Error(x); })(state);
+	}
+
+	async function submit() {
+		if (state.s !== 'ready') { return; }
+		const r = await fetch(`https://coasterseatguru.azurewebsites.net/api/Vote?id=${id}&uid=${parseJwtSub(state.token)}`, {
+			method: 'POST',
+			body: JSON.stringify({
+				token: state.token,
+				votes: state.selected.map((row) => row.map((vote) => (vote === undefined ? null : vote))),
+			}),
+		});
+		if (r.ok) {
+			setState({ s: 'done' });
+		}
 	}
 
 	/** @type {[string, string]} */
@@ -189,8 +218,7 @@ function Contribution() {
 				' ',
 				// @ts-ignore
 				step !== 3 ? e('button', { className: 'bigBtn', onClick: () => setStep(step + 1) }, 'Next') : null,
-				step === 3 ? e('button', { className: 'bigBtn' }, 'Submit') : null,
-				// TODO
+				step === 3 ? e('button', { className: 'bigBtn', onClick: submit }, 'Submit') : null,
 			),
 		),
 	);

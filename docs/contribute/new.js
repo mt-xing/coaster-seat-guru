@@ -34,6 +34,7 @@ function Contribution() {
 	const [cols, setCols] = useState(0);
 
 	const [token, setToken] = useState('');
+	const [submitting, setSubmitting] = useState(false);
 
 	const setColsSafe = useCallback((v) => {
 		// @ts-ignore
@@ -51,6 +52,28 @@ function Contribution() {
 		}
 		setRows(val);
 	}, [setRows]);
+
+	async function submit() {
+		setSubmitting(true);
+		const rcdbMatch = /http(?:s?):\/\/rcdb.com\/([\d]+)\.htm/.exec(rcdb);
+		if (rcdbMatch === null) {
+			return;
+		}
+		const r = await fetch(`https://coasterseatguru.azurewebsites.net/api/CreateCoaster?id=${rcdbMatch[1]}`, {
+			method: 'POST',
+			body: JSON.stringify({
+				token,
+				rcdb,
+				name,
+				park,
+				rows,
+				cols,
+			}),
+		});
+		if (r.ok) {
+			window.location.replace(`/results?id=${rcdbMatch[1]}`);
+		}
+	}
 
 	// @ts-ignore
 	// eslint-disable-next-line no-undef
@@ -87,7 +110,7 @@ function Contribution() {
 		);
 	}
 
-	const ready = name !== '' && park !== '' && rcdb !== '' && /http(?:s?):\/\/rcdb.com\/[\d]+\.htm/.test(rcdb) && rows > 0 && cols > 0;
+	const ready = !submitting && name !== '' && park !== '' && rcdb !== '' && /http(?:s?):\/\/rcdb.com\/[\d]+\.htm/.test(rcdb) && rows > 0 && cols > 0;
 
 	return e(
 		frag,
@@ -110,8 +133,7 @@ function Contribution() {
 			type: 'number', min: 0, max: 100, value: cols, onChange: setColsSafe,
 		}))),
 		e('p', null, 'My site currently only supports rectangular layouts. If a train has a more esoteric design, please let me know.'),
-		e('p', null, e('button', { className: ready ? 'bigBtn' : 'bigBtn disabled' }, 'Submit')),
-		// TODO
+		e('p', null, e('button', { className: ready ? 'bigBtn' : 'bigBtn disabled', onClick: submit }, 'Submit')),
 	);
 }
 
