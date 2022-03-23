@@ -156,6 +156,7 @@ module.exports = async function (context, req, inputDocument, userDocument) {
 	context.bindings.outputDocument = JSON.stringify({
 		id: inputDocument.id,
 		name: inputDocument.name,
+		searchName: inputDocument.searchName,
 		park: inputDocument.park,
 		rows: inputDocument.rows,
 		cols: inputDocument.cols,
