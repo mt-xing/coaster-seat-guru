@@ -18,9 +18,9 @@ const useCallback = React.useCallback;
 
 const fakeNames = [
 	{ name: 'Angry 326', park: 'Dakotawinds' },
-	{ name: 'Metal Retaliation', park: 'Oak Point' },
-	{ name: 'Z3', park: 'Five Banners Mystical Hill' },
-	{ name: 'Magic Wood', park: 'Monarch\'s Island' },
+	{ name: 'Steel Retaliation', park: 'Cedar Tip' },
+	{ name: 'Z3', park: 'Five Banners Magic Hill' },
+	{ name: 'Mystic Wood', park: 'King\'s Isle' },
 ];
 const fakeName = fakeNames[Math.floor(Math.random() * fakeNames.length)];
 
