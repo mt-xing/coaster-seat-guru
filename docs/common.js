@@ -67,22 +67,40 @@ class Search extends HTMLElement {
 	}
 
 	#querySearch() {
-		// TODO
 		this.#debounce = undefined;
-		this.#populateList([{ name: 'Fury 325', sub: 'Carowinds', id: '1' }]);
+
+		const p = async () => {
+			const val = this.#input.value.replace(/[\W_]+/g, '').toLowerCase();
+			if (val === '') {
+				this.#resultsWrapper.style.display = '';
+				return;
+			}
+			const result = await fetch(`https://coasterseatguru.azurewebsites.net/api/Search?q=${val}`);
+			if (!result.ok) {
+				this.#resultsWrapper.style.display = '';
+				return;
+			}
+			const r = await result.json();
+			this.#populateList(r);
+		};
+		p();
 	}
 
 	/**
-	 * @param {{name: string, sub: string, id: string}[]} list
+	 * @param {{name: string, park: string, id: string}[]} list
 	 */
 	#populateList(list) {
 		this.#clearList();
-		list.forEach((x) => this.#addChildToList(x.name, x.sub, x.id));
+		list.forEach((x) => this.#addChildToList(x.name, x.park, x.id));
 		if (list.length === 0) {
 			this.#resultsWrapper.style.display = '';
-		} else {
-			this.#resultsWrapper.style.display = 'block';
+
+			const li = this.#results.appendChild(document.createElement('li'));
+			const main = li.appendChild(document.createElement('p'));
+			main.className = 'none';
+			main.textContent = 'No results found :(';
 		}
+		this.#resultsWrapper.style.display = 'block';
 	}
 
 	#clearList() {
