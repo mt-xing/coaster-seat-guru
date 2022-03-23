@@ -1,11 +1,11 @@
 const { OAuth2Client } = require('google-auth-library');
 
-const client = new OAuth2Client('576763212029-fsd49s3dgcnmrpm2rcgovfkvlkhp8ube.apps.googleusercontent.com');
+const client = new OAuth2Client('707815788715-v292qtutlmval10742tekpbnv2a6to6l.apps.googleusercontent.com');
 
 async function verify(token) {
 	const ticket = await client.verifyIdToken({
 		idToken: token,
-		audience: '576763212029-fsd49s3dgcnmrpm2rcgovfkvlkhp8ube.apps.googleusercontent.com',
+		audience: '707815788715-v292qtutlmval10742tekpbnv2a6to6l.apps.googleusercontent.com',
 	});
 	return ticket.getPayload().sub;
 }

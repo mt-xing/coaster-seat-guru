@@ -88,7 +88,7 @@ function Contribution() {
 			// @ts-ignore
 			// eslint-disable-next-line no-undef
 			google.accounts.id.initialize({
-				client_id: '576763212029-fsd49s3dgcnmrpm2rcgovfkvlkhp8ube.apps.googleusercontent.com',
+				client_id: '707815788715-v292qtutlmval10742tekpbnv2a6to6l.apps.googleusercontent.com',
 				callback: handleCredentialResponse,
 			});
 			// @ts-ignore
