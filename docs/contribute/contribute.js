@@ -47,9 +47,21 @@ function Contribution() {
 	React.useEffect(() => {
 		switch (state.s) {
 		case 'signin': {
+			const currentToken = window.sessionStorage.getItem('oauthToken');
+			if (currentToken !== null) {
+				const tokenInfo = JSON.parse(currentToken);
+				if (tokenInfo.time > new Date().getTime()) {
+					setState({ s: 'load', token: tokenInfo.token });
+				}
+			}
+
 			/** @param {Record<string, unknown>} response */
 			const handleCredentialResponse = (response) => {
 				const token = /** @type {string} */(response.credential);
+				window.sessionStorage.setItem('oauthToken', JSON.stringify({
+					time: new Date().getTime() + 30 * 60 * 1000, // 30 min * 60 sec / min * 1000 ms / sec
+					token,
+				}));
 				setState({ s: 'load', token });
 			};
 			// @ts-ignore

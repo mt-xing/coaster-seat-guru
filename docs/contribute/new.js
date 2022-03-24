@@ -80,10 +80,23 @@ function Contribution() {
 	// eslint-disable-next-line no-undef
 	React.useEffect(() => {
 		if (!state) {
+			const currentToken = window.sessionStorage.getItem('oauthToken');
+			if (currentToken !== null) {
+				const tokenInfo = JSON.parse(currentToken);
+				if (tokenInfo.time > new Date().getTime()) {
+					setToken(tokenInfo.token);
+					setState(true);
+				}
+			}
+
 			/** @param {Record<string, unknown>} response */
 			const handleCredentialResponse = (response) => {
 				// @ts-ignore
 				setToken(response.credential);
+				window.sessionStorage.setItem('oauthToken', JSON.stringify({
+					time: new Date().getTime() + 30 * 60 * 1000, // 30 min * 60 sec / min * 1000 ms / sec
+					token: response.credential,
+				}));
 				setState(true);
 			};
 			// @ts-ignore
