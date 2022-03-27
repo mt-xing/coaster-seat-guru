@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { ChangeEvent, useCallback, useState } from 'react';
 import { SyncLoader } from 'react-spinners';
 import styles from '../styles/Search.module.css';
 import { assertUnreachable } from '../utils/assert';
@@ -21,7 +21,7 @@ export default function Search() {
 	const [debounce, setDebounce] = useState<number | null>(null);
 	const [list, setList] = useState<ListStatus>({ s: 'hidden' });
 
-	const executeQuery = useCallback(async (q) => {
+	const executeQuery = useCallback(async (q: string) => {
 		setDebounce(null);
 		const val = q.replace(/[\W_]+/g, '').toLowerCase();
 		if (val === '') {
@@ -37,7 +37,7 @@ export default function Search() {
 		setList({ s: 'displayed', list: r });
 	}, [setList, setDebounce]);
 
-	const changeSearch = useCallback((e) => {
+	const changeSearch = useCallback((e: ChangeEvent<HTMLInputElement>) => {
 		const q = e.target.value;
 		setQuery(q);
 		if (debounce) {
@@ -49,7 +49,7 @@ export default function Search() {
 			return;
 		}
 		setList({ s: 'loading' });
-		setDebounce(window.setTimeout(() => executeQuery(q), 1000));
+		setDebounce(window.setTimeout(() => void executeQuery(q), 1000));
 	}, [setQuery, debounce, setDebounce, executeQuery]);
 
 	const renderList = useCallback(() => {
