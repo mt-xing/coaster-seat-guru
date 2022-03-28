@@ -3,6 +3,7 @@ import { ChangeEvent, useCallback, useState } from 'react';
 import { SyncLoader } from 'react-spinners';
 import styles from '../styles/Search.module.css';
 import { assertUnreachable } from '../utils/assert';
+import { API_ENDPOINT } from '../utils/consts';
 
 type QueryResponse = {
 	id: string, name: string, park: string
@@ -29,7 +30,7 @@ export default function Search() {
 			setList({ s: 'hidden' });
 			return;
 		}
-		const result = await fetch(`https://coasterseatguru.azurewebsites.net/api/Search?q=${val}`);
+		const result = await fetch(`${API_ENDPOINT}Search?q=${val}`);
 		if (!result.ok) {
 			setList({ s: 'hidden' });
 			return;

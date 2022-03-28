@@ -37,6 +37,9 @@
       "no-else-return": "off",
       "no-continue": "off",
       "func-names": "off",
-      "no-void": "off"
+      "no-void": "off",
+
+      "comma-dangle": "off",
+      "@typescript-eslint/comma-dangle": ["error", "only-multiline"]
   }
 }
