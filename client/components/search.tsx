@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { ChangeEvent, useCallback, useState } from 'react';
 import { SyncLoader } from 'react-spinners';
 import styles from '../styles/Search.module.css';
@@ -70,10 +71,12 @@ export default function Search() {
 					<ul>
 						{list.list.map((item) => (
 							<li key={item.id}>
-								<a href={`/results?id=${item.id}`}>
-									<p>{item.name}</p>
-									<p>{item.park}</p>
-								</a>
+								<Link href={`/results?id=${item.id}`}>
+									<a>
+										<p>{item.name}</p>
+										<p>{item.park}</p>
+									</a>
+								</Link>
 							</li>
 						))}
 					</ul>

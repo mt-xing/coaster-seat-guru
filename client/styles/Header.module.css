@@ -1,0 +1,47 @@
+.header {
+	width: 100%;
+	box-shadow: 0 5px 5px black;
+	text-align: left;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.img {
+	margin-right: 10px;
+}
+
+.h1 {
+	margin: 15px 30px;
+	font-size: 35px;
+	display: inline-block;
+}
+
+.div {
+	float: right;
+	border: 1px black solid;
+	margin-left: auto;
+	margin-right: 20px;
+}
+
+.a {
+	text-decoration: none;
+	color: black;
+}
+
+@media(max-width: 950px) {
+	.header {
+		flex-direction: column;
+	}
+
+	.h1 {
+		display: block;
+		text-align: center;
+	}
+
+	.div {
+		display: inline-block;
+		float: none;
+		margin: 0 auto;
+	}
+}

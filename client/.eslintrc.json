@@ -6,6 +6,7 @@
   },
   "extends": [
     "eslint:recommended",
+    "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "airbnb-base",
@@ -23,7 +24,6 @@
   "rules": {
       "indent": ["warn", "tab"],
       "no-tabs": "off",
-      "import/no-cycle": "off",
       "max-classes-per-file": "off",
       "class-methods-use-this": "off",
       "no-use-before-define": "off",
