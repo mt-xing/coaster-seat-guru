@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { useCallback, useEffect, useState } from 'react';
 import { SyncLoader } from 'react-spinners';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Footer from '../components/footer';
 import Header from '../components/header';
 import { assertUnreachable } from '../utils/assert';
@@ -36,10 +37,9 @@ function ResultsPage() {
 		setState({ s: 'Not Found' });
 	}, []);
 
+	const { id } = useRouter().query;
 	useEffect(() => {
-		const id = new URLSearchParams(window.location.search).get('id');
-
-		if (id === null) {
+		if (id === undefined || Array.isArray(id)) {
 			notFound();
 			return;
 		}
@@ -55,7 +55,7 @@ function ResultsPage() {
 			setState({ s: 'Ready', ...data });
 		};
 		void f();
-	}, [notFound]);
+	}, [notFound, id]);
 
 	const render = useCallback(() => {
 		switch (state.s) {
