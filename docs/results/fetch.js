@@ -123,7 +123,6 @@ function populate(id, name, park, rows, cols, data, total) {
 				btn.style.background = 'gray';
 			} else {
 				const val = d[0] * 3 + d[1] - d[2] * 3;
-				btn.style.background = val > 0 ? 'rgb(' : '';
 				if (val >= 0) {
 					// eslint-disable-next-line no-mixed-operators
 					const g = val / minmax[1] * 128 + 128;
