@@ -39,6 +39,11 @@ export default function Search() {
 		setList({ s: 'displayed', list: r });
 	}, [setList, setDebounce]);
 
+	const clearQuery = useCallback(() => {
+		setQuery('');
+		setList({ s: 'hidden' });
+	}, []);
+
 	const changeSearch = useCallback((e: ChangeEvent<HTMLInputElement>) => {
 		const q = e.target.value;
 		setQuery(q);
@@ -73,7 +78,7 @@ export default function Search() {
 						{list.list.map((item) => (
 							<li key={item.id}>
 								<Link href={`/results?id=${item.id}`}>
-									<a>
+									<a onClick={clearQuery}>
 										<p>{item.name}</p>
 										<p>{item.park}</p>
 									</a>
