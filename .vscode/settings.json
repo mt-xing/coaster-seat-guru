@@ -3,6 +3,7 @@
         "source.fixAll.eslint": true
     },
     "eslint.validate": ["javascript"],
+    "eslint.workingDirectories": ["./client"],
     "files.eol": "\n",
     "editor.tabSize": 4,
     "editor.insertSpaces": false,

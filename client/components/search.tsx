@@ -91,7 +91,7 @@ export default function Search() {
 		default:
 			return assertUnreachable(list);
 		}
-	}, [list]);
+	}, [list, clearQuery]);
 
 	return <>
 		<input type='text' placeholder='Search for a coaster' value={query} onChange={changeSearch} className={styles.input} />
