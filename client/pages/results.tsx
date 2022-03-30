@@ -20,6 +20,7 @@ type ResultsState = {
 	s: 'Not Found',
 } | ({
 	s: 'Ready',
+	selected: { row: number, col: number } | null,
 } & QueryResult);
 
 type QueryResult = {
@@ -54,6 +55,14 @@ function colorOfScore(data: [number, number, number], max: number): string {
 function ResultsPage() {
 	const [state, setState] = useState<ResultsState>({ s: 'Loading' });
 
+	const setSelected = useCallback((r: number, c: number) => {
+		if (state.s !== 'Ready') { return; }
+		setState({
+			...state,
+			selected: { row: r, col: c },
+		});
+	}, [state]);
+
 	const notFound = useCallback(() => {
 		window.document.title = `N/A - ${PRODUCT_NAME}`;
 		setState({ s: 'Not Found' });
@@ -74,24 +83,58 @@ function ResultsPage() {
 			}
 			const data = await result.json() as QueryResult;
 			window.document.title = `${data.name} Seat Map - ${PRODUCT_NAME}`;
-			setState({ s: 'Ready', ...data });
+			setState({ s: 'Ready', ...data, selected: null });
 		};
 		void f();
 	}, [notFound, id]);
 
-	const minmax = useMemo(() => {
-		if (state.s !== 'Ready') { return NaN; }
+	const [minmax, maxVotes] = useMemo(() => {
+		if (state.s !== 'Ready') { return [NaN, NaN]; }
 		let mm = 6;
+		let maxV = 0;
 		state.data.forEach((row) => {
 			row.forEach((v) => {
 				const rr = Math.abs(weightedScore(v));
 				if (rr > mm) {
 					mm = rr;
 				}
+				const numV = v.reduce((a, x) => a + x);
+				if (numV > maxV) { maxV = numV; }
 			});
 		});
-		return mm;
+		return [mm, maxV];
 	}, [state]);
+
+	const getSelectionDetails = useCallback((s: ResultsState) => {
+		if (s.s !== 'Ready') { return null; }
+		if (s.selected === null) { return null; }
+		const r = s.selected.row;
+		const c = s.selected.col;
+		const d = s.data[r][c];
+		const voteTotal = d.reduce((a, x) => a + x);
+		const max = d.reduce((a, x) => (x > a ? x : a));
+		const left = s.total - voteTotal;
+		return <>
+			<h2>Row {r + 1} &mdash; Seat {c + 1}</h2>
+			<table>
+				<tbody>
+					{[['Love', '#2E7D32'], ['Like', '#0277BD'], ['Hate', '#C62828']].map((voteType, i) => {
+						const v = d[i];
+						return <tr key={voteType[0]}>
+							<th>{voteType[0]}</th>
+							<td><span style={{
+								width: `${max === 0 ? 0 : (((v / maxVotes) * 100) / 2)}%`,
+								backgroundColor: voteType[1],
+							}}></span>{`${max === 0 ? 0 : (Math.round((v / voteTotal) * 100))}% (${v})`}</td>
+						</tr>;
+					})}
+					<tr>
+						<td colSpan={2}>{left} {left === 1 ? 'user' : 'users'} had no opinion</td>
+					</tr>
+				</tbody>
+			</table>
+		</>;
+	}, [maxVotes]);
 
 	return useCallback(() => {
 		switch (state.s) {
@@ -103,21 +146,32 @@ function ResultsPage() {
 				<Link href='/contribute/newCoaster'><a className={btnStyle.bigBtn}>Why not add it?</a></Link>
 			</div>;
 		case 'Ready':
-			return <>
+			if (id === undefined || Array.isArray(id)) {
+				throw new Error();
+			}
+			return <main className={styles.main}>
 				<h1>{state.name}</h1>
 				<h2>{state.park}</h2>
 				<Train
 					rows={state.rows}
 					cols={state.cols}
-					render={(r, c) => <button style={
-						{ backgroundColor: colorOfScore(state.data[r][c], minmax) }
-					}></button>}
+					render={(r, c) => <button
+						style={{ backgroundColor: colorOfScore(state.data[r][c], minmax) }}
+						onClick={() => setSelected(r, c)}
+					></button>}
 				/>
-			</>;
+				<section className={styles.details}>
+					{state.selected === null
+						? <h2>Select a seat to see ratings</h2>
+						: getSelectionDetails(state)
+					}
+					<Link href={`/contribute?id=${id}`}><a className={`${btnStyle.bigBtn} ${styles.voteBtn}`}>Vote on your favorite seats</a></Link>
+				</section>
+			</main>;
 		default:
 			return assertUnreachable(state);
 		}
-	}, [state, minmax])();
+	}, [id, state, minmax, setSelected, getSelectionDetails])();
 }
 
 const Results: NextPage = () => (
