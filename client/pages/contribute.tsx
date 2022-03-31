@@ -223,6 +223,9 @@ function VotePage() {
 					}}
 				/>
 				<section className={styles.details}>
+					<div className={styles.progress}>
+						{[1, 2, 3].map((step) => <span key={step} className={state.step === step ? styles.active : ''}>{step}</span>)}
+					</div>
 					<div>
 						<h2>{instrs[0]}</h2>
 						<p>{instrs[1]}</p>

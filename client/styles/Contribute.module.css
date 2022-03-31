@@ -33,3 +33,22 @@
 	margin: 0;
 	font-size: 80%;
 }
+
+.progress {
+    text-align: center;
+}
+
+.progress span {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin: 0 5px;
+    line-height: 20px;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0);
+    transition: background 0.5s ease-in-out;
+}
+
+.progress span.active {
+    background: lightgray;
+}
