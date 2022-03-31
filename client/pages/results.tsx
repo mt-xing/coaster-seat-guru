@@ -68,8 +68,12 @@ function ResultsPage() {
 		setState({ s: 'Not Found' });
 	}, []);
 
-	const { id } = useRouter().query;
+	const router = useRouter();
+	const { id } = router.query;
+	const idReady = router.isReady;
+
 	useEffect(() => {
+		if (!idReady) { return; }
 		if (id === undefined || Array.isArray(id)) {
 			notFound();
 			return;
@@ -86,7 +90,7 @@ function ResultsPage() {
 			setState({ s: 'Ready', ...data, selected: null });
 		};
 		void f();
-	}, [notFound, id]);
+	}, [notFound, id, idReady]);
 
 	const [minmax, maxVotes] = useMemo(() => {
 		if (state.s !== 'Ready') { return [NaN, NaN]; }
