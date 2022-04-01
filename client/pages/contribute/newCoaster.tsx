@@ -219,7 +219,7 @@ const SubmitCoaster: NextPage = () => (
 		</Head>
 		<Header />
 		<AuthWrapper page={<SubmitCoasterPage />} />
-		<Footer />
+		<Footer isDark={false} />
 	</>
 );
 

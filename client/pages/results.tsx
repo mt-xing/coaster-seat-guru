@@ -186,7 +186,7 @@ const Results: NextPage = () => (
 		</Head>
 		<Header />
 		<ResultsPage />
-		<Footer />
+		<Footer isDark={false} />
 	</>
 );
 

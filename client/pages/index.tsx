@@ -21,7 +21,7 @@ const Home: NextPage = () => (
 				<Search />
 			</p>
 
-			<Footer />
+			<Footer isDark={true} />
 		</div>
 	</div>
 );

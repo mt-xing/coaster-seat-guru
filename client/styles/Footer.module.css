@@ -1,0 +1,15 @@
+.footer a {
+	color: black !important;
+}
+
+.dark a {
+	color: white !important;
+}
+
+.footer a:hover {
+	text-decoration: none;
+}
+
+.footer a:active {
+	text-decoration: underline;
+}

@@ -293,7 +293,7 @@ const Contribute: NextPage = () => (
 		</Head>
 		<Header />
 		<AuthWrapper page={<VotePage />} />
-		<Footer />
+		<Footer isDark={false} />
 	</>
 );
 
