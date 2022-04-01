@@ -169,6 +169,9 @@ function ResultsPage() {
 						? <h2>Select a seat to see ratings</h2>
 						: getSelectionDetails(state)
 					}
+					<p className={styles.contactMsg}>
+						If something is wrong with this coaster,<br />please let me know on <a href='https://www.reddit.com/r/rollercoasters/comments/tkwcol/other_i_built_coasterseatgurucom_for_people_to/'>reddit</a>.
+					</p>
 					<Link href={`/contribute?id=${id}`}><a className={`${btnStyle.bigBtn} ${styles.voteBtn}`}>Vote on your favorite seats</a></Link>
 				</section>
 			</main>;

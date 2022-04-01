@@ -57,3 +57,19 @@
 		text-align: left;
 	}
 }
+
+.contactMsg {
+	font-size: 70%;
+}
+
+.contactMsg a {
+	color: black;
+}
+
+.contactMsg a:hover {
+	text-decoration: none;
+}
+
+.contactMsg a:active {
+	text-decoration: underline;
+}
