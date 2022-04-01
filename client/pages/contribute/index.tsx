@@ -7,15 +7,15 @@ import { SyncLoader } from 'react-spinners';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import jwtDecode from 'jwt-decode';
-import Footer from '../components/footer';
-import Header from '../components/header';
-import { assertUnreachable } from '../utils/assert';
-import { API_ENDPOINT, PRODUCT_NAME } from '../utils/consts';
-import styles from '../styles/Contribute.module.css';
-import btnStyle from '../styles/BigButton.module.css';
-import Train from '../components/train';
-import { getAuth, storeAuth } from '../utils/auth';
-import AuthWrapper from '../components/authWrapper';
+import Footer from '../../components/footer';
+import Header from '../../components/header';
+import { assertUnreachable } from '../../utils/assert';
+import { API_ENDPOINT, CLIENT_ID, PRODUCT_NAME } from '../../utils/consts';
+import styles from '../../styles/Contribute.module.css';
+import btnStyle from '../../styles/BigButton.module.css';
+import Train from '../../components/train';
+import { getAuth, storeAuth } from '../../utils/auth';
+import AuthWrapper from '../../components/authWrapper';
 
 type ResultsState = {
 	s: 'Unauthenticated',
@@ -86,7 +86,7 @@ function VotePage() {
 				return;
 			}
 			google.accounts.id.initialize({
-				client_id: '707815788715-v292qtutlmval10742tekpbnv2a6to6l.apps.googleusercontent.com',
+				client_id: CLIENT_ID,
 				callback: handleCredentialResponse
 			});
 			google.accounts.id.renderButton(
@@ -289,7 +289,7 @@ const Contribute: NextPage = () => (
 	<>
 		<Head>
 			<title>Submit Vote - {PRODUCT_NAME}</title>
-			<meta name="description" content="Coaster seat map" />
+			<meta name="description" content="Vote on a coaster's seats" />
 		</Head>
 		<Header />
 		<AuthWrapper page={<VotePage />} />
