@@ -1,0 +1,27 @@
+.main {
+	text-align: center;
+}
+
+.load {
+	text-align: center;
+	height: 400px;
+	max-height: 60vh;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.load h1 {
+	margin-bottom: 20px;
+}
+
+.main input {
+	border: none;
+	border-bottom: 1px black solid;
+	padding: 5px 10px;
+	font-size: 16px;
+
+	transition: border-bottom 0.5s ease-in-out;
+}

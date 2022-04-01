@@ -1,0 +1,29 @@
+{
+  "name": "coasterseatguru",
+  "version": "1.0.0",
+  "description": "Seat Guru, but for roller coasters",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build && next export -o ../docs",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "jwt-decode": "^3.1.2",
+    "next": "12.1.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-spinners": "^0.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "17.0.23",
+    "@types/react": "17.0.43",
+    "@typescript-eslint/eslint-plugin": "^5.16.0",
+    "@typescript-eslint/parser": "^5.16.0",
+    "eslint": "8.11.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-next": "12.1.0",
+    "eslint-plugin-react": "^7.29.4",
+    "typescript": "4.6.3"
+  }
+}

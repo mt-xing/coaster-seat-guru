@@ -1,0 +1,59 @@
+.main {
+	text-align: center;
+}
+
+.load {
+	text-align: center;
+	height: 400px;
+	max-height: 60vh;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.details {
+	display: inline-block;
+	margin-left: 100px;
+	vertical-align: top;
+}
+
+.details table {
+	text-align: left;
+	width: 100%;
+}
+
+.details td {
+	min-width: 200px;
+}
+
+.details table span {
+    display: inline-block;
+    height: 1em;
+    margin-right: 5px;
+	width: 0;
+	transition: width 0.5s ease-in-out;
+}
+
+.voteBtn {
+	margin-top: 10px;
+	display: inline-block;
+}
+
+@media (max-width: 700px) {
+	.details {
+		display: block;
+		margin-left: 0;
+		margin-bottom: 30px;
+	}
+
+	.details table {
+		text-align: center;
+	}
+
+	.details tbody {
+		display: inline-block;
+		text-align: left;
+	}
+}

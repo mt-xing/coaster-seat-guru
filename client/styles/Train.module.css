@@ -1,0 +1,48 @@
+.coaster {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.coaster p {
+    text-align: center;
+    margin: 0;
+}
+
+.coasterTrain {
+    border-spacing: 5px;
+}
+
+.coasterTrain td {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    overflow: hidden;
+}
+
+.coasterTrain input[type="checkbox"], .coasterTrain button {
+    width: 30px;
+    height: 30px;
+    margin: 0;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.coasterTrain button {
+    border: none;
+}
+
+.coasterTrain button:hover, .coasterTrain button:focus {
+    box-shadow: 0 0 1px black;
+}
+
+.coasterTrain button:active {
+    box-shadow: none;
+}
+
+.coasterTrain td:first-child {
+    background: initial;
+    width: initial;
+    height: initial;
+    font-size: 20px;
+    line-height: 30px;
+}
