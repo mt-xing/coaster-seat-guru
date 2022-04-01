@@ -208,7 +208,7 @@ function SubmitCoasterPage() {
 		default:
 			return assertUnreachable(state);
 		}
-	}, [state, submit, reload, name, park, rows, cols, rcdb, setColsSafe, setRowsSafe])();
+	}, [state, submit, reload, name, park, rows, cols, rcdb, setColsSafe, setRowsSafe, canSubmit])();
 }
 
 const SubmitCoaster: NextPage = () => (
