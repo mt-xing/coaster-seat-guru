@@ -4,7 +4,7 @@
   "description": "Seat Guru, but for roller coasters",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && next export -o ../docs",
     "start": "next start",
     "lint": "next lint"
   },
