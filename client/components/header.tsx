@@ -1,6 +1,5 @@
-import Image from 'next/image';
+/* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
-import PRODUCT_IMAGE from '../public/img/icon.png';
 import { PRODUCT_NAME } from '../utils/consts';
 import Search from './search';
 
@@ -12,7 +11,7 @@ export default function Header() {
 			<h1 className={styles.h1}>
 				<Link href='/'>
 					<a className={styles.a}>
-						<span className={styles.img}><Image src={PRODUCT_IMAGE} alt='' height={35} width={35} /></span>
+						<img src='/img/icon.png' alt='' className={styles.img} />
 						{PRODUCT_NAME}
 					</a>
 				</Link>
