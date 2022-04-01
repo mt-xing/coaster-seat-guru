@@ -52,3 +52,10 @@
 .progress span.active {
     background: lightgray;
 }
+
+@media (max-width: 700px) {
+	.details {
+		display: block;
+		margin: 30px;
+	}
+}
