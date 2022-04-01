@@ -14,7 +14,7 @@ const Home: NextPage = () => (
 			</Head>
 
 			<h1 className={styles.title}>
-			Seat Guru
+				{PRODUCT_NAME}
 			</h1>
 
 			<p className={styles.searchWrap}>
