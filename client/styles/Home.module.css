@@ -37,3 +37,13 @@
 .footer a {
   color: white;
 }
+
+@media(max-width: 700px) {
+  .container {
+    justify-content: flex-start;
+  }
+
+  .container h1 {
+    margin-top: 20vh;
+  }
+}
