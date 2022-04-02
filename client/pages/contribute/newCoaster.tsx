@@ -13,6 +13,7 @@ import styles from '../../styles/NewCoaster.module.css';
 import btnStyle from '../../styles/BigButton.module.css';
 import { getAuth, storeAuth } from '../../utils/auth';
 import AuthWrapper from '../../components/authWrapper';
+import AuthBlocker from '../../components/authBlocker';
 
 const fakeNames = [
 	{ name: 'Angry 326', park: 'Dakotawinds' },
@@ -143,16 +144,7 @@ function SubmitCoasterPage() {
 	return useCallback(() => {
 		switch (state.s) {
 		case 'Unauthenticated':
-			return <div className={styles.load}>
-				<h1>Sign In</h1>
-				<div id='gbuttonDiv' className={styles.signInBtn}></div>
-				<p>
-					This is my attempt to stop the same person from spamming
-					multiple reviews on the same ride.
-					I don&apos;t track anything from your Google account.
-					If you have a better idea for how to do this, suggestions are welcome.
-				</p>
-			</div>;
+			return <AuthBlocker />;
 		case 'Ready':
 			return <main className={styles.main}>
 				<h1>New Coaster</h1>

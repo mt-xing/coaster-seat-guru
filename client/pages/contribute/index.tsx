@@ -16,6 +16,7 @@ import btnStyle from '../../styles/BigButton.module.css';
 import Train from '../../components/train';
 import { getAuth, storeAuth } from '../../utils/auth';
 import AuthWrapper from '../../components/authWrapper';
+import AuthBlocker from '../../components/authBlocker';
 
 type ResultsState = {
 	s: 'Unauthenticated',
@@ -179,16 +180,7 @@ function VotePage() {
 	return useCallback(() => {
 		switch (state.s) {
 		case 'Unauthenticated':
-			return <div className={styles.load}>
-				<h1>Sign In</h1>
-				<div id='gbuttonDiv' className={styles.signInBtn}></div>
-				<p>
-					This is my attempt to stop the same person from spamming
-					multiple reviews on the same ride.
-					I don&apos;t track anything from your Google account.
-					If you have a better idea for how to do this, suggestions are welcome.
-				</p>
-			</div>;
+			return <AuthBlocker />;
 		case 'Loading':
 			return <div className={styles.load}><SyncLoader /></div>;
 		case 'Not Found':
