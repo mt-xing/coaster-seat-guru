@@ -29,10 +29,12 @@
 
 .coasterTrain button {
     border: none;
+    box-shadow: 0 0 1px 1px black;
+    transition: box-shadow 0.1s ease-in-out;
 }
 
 .coasterTrain button:hover, .coasterTrain button:focus {
-    box-shadow: 0 0 1px black;
+    box-shadow: 0 0 1px 2px black;
 }
 
 .coasterTrain button:active {
