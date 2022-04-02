@@ -25,8 +25,10 @@ export default class HeatMap {
 	}
 
 	colorOfScore(data: [number, number, number]): string {
-		const voteIntensity = (Math.max(data[0], data[2]) - Math.abs(data[2] - data[0]))
-			/ (this.maxVotes / 2);
+		if (this.maxVotes === 0) {
+			return 'rgb(128, 128, 128)';
+		}
+		const voteIntensity = Math.min(data[0], data[2]) / (this.maxVotes / 2);
 		const yellowDeviation = Math.floor(voteIntensity * 128);
 		const yellow = [128 + yellowDeviation, 128 + yellowDeviation, 128 - yellowDeviation];
 

@@ -61,7 +61,7 @@ export default function Search() {
 
 	const renderList = useCallback(() => {
 		const addPrompt = <span className={styles.prompt}>
-			Don&apos;t see a coaster? <a href="/contribute/newCoaster">Add it!</a>
+			Don&apos;t see a coaster? <Link href="/contribute/newCoaster"><a>Add it!</a></Link>
 		</span>;
 		switch (list.s) {
 		case 'hidden':
