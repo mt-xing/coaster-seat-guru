@@ -1,5 +1,48 @@
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    text-align: left;
+    font-size: 80%;
+
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	align-items: flex-end;
+
+	background: white;
+	padding: 8px 0;
+	box-shadow: 0 -1px 5px 0px black;
+}
+
+.footer > div {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-self: stretch;
+}
+
+.footer > div:first-child {
+	font-size: 115%;
+	margin-left: 10px;
+}
+
+.footer > div:last-child {
+	text-align: right;
+}
+
+.footer p {
+	margin: 0 5px;
+}
+
 .footer a {
 	color: black !important;
+}
+
+.dark {
+	background: none;
+	box-shadow: none;
 }
 
 .dark a {
@@ -12,4 +55,15 @@
 
 .footer a:active {
 	text-decoration: underline;
+}
+
+@media(max-width: 700px) {
+	.footer {
+		flex-direction: column;
+	}
+
+	.footer > div:last-child {
+		text-align: left;
+		margin-left: 10px;
+	}
 }
