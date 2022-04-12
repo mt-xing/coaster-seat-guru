@@ -5,6 +5,8 @@ import styles from '../styles/Search.module.css';
 import { assertUnreachable } from '../utils/assert';
 import { API_ENDPOINT } from '../utils/consts';
 
+const DEBOUNCE_TIME = 500;
+
 type QueryResponse = {
 	id: string, name: string, park: string
 };
@@ -56,7 +58,7 @@ export default function Search() {
 			return;
 		}
 		setList({ s: 'loading' });
-		setDebounce(window.setTimeout(() => void executeQuery(q), 1000));
+		setDebounce(window.setTimeout(() => void executeQuery(q), DEBOUNCE_TIME));
 	}, [setQuery, debounce, setDebounce, executeQuery]);
 
 	const renderList = useCallback(() => {
