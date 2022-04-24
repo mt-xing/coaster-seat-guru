@@ -1,5 +1,6 @@
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import { OAuth2Client } from 'google-auth-library';
+import { CreateCoasterPayload } from '../types/createCoaster';
 
 const client = new OAuth2Client('707815788715-v292qtutlmval10742tekpbnv2a6to6l.apps.googleusercontent.com');
 
@@ -20,7 +21,9 @@ const httpTrigger: AzureFunction = async function (
 		return;
 	}
 
-	const { token } = req.body;
+	const body = req.body as CreateCoasterPayload;
+
+	const { token, rcdb } = body;
 	if (!token) {
 		context.res = { status: 401 };
 		return;
@@ -32,7 +35,7 @@ const httpTrigger: AzureFunction = async function (
 		return;
 	}
 
-	const rcdbMatch = /http(?:s?):\/\/rcdb.com\/([\d]+)\.htm/.exec(req.body.rcdb);
+	const rcdbMatch = /http(?:s?):\/\/rcdb.com\/([\d]+)\.htm/.exec(rcdb);
 	if (rcdbMatch === null) {
 		context.res = { status: 400 };
 		return;
@@ -47,9 +50,9 @@ const httpTrigger: AzureFunction = async function (
 		context.res = { status: 409 };
 		return;
 	}
-	const { name, park } = req.body;
-	const rows = parseInt(req.body.rows, 10);
-	const cols = parseInt(req.body.cols, 10);
+	const {
+		name, park, rows, cols,
+	} = body;
 
 	if (!name || !park || !rows || !cols) {
 		context.res = { status: 400 };
@@ -64,7 +67,7 @@ const httpTrigger: AzureFunction = async function (
 		rows,
 		cols,
 		data: Array.from(Array(rows).keys()).map(
-			(_) => Array.from(Array(cols).keys()).map((y) => [0, 0, 0]),
+			(_) => Array.from(Array(cols).keys()).map((_y) => [0, 0, 0]),
 		),
 		total: 0,
 	});
