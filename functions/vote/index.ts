@@ -59,7 +59,9 @@ class User {
   }
 }
 
-const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest, inputDocument, userDocument): Promise<void> {
+const httpTrigger: AzureFunction = async function (
+  context: Context, req: HttpRequest, inputDocument, userDocument,
+): Promise<void> {
   context.log('Saving changes to coaster');
 
   if (!inputDocument) {

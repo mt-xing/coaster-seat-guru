@@ -21,7 +21,12 @@
         "import"
     ],
     "rules": {
-        "import/no-unresolved": "error"
+        "import/no-unresolved": "error",
+        "func-names": "off",
+        "function-paren-newline": ["error", "consistent"],
+
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
     },
     "settings": {
         "import/parsers": {

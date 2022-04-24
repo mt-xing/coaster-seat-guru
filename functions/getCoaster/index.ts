@@ -1,6 +1,8 @@
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 
-const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest, inputDocument): Promise<void> {
+const httpTrigger: AzureFunction = function (
+  context: Context, req: HttpRequest, inputDocument,
+): void {
   context.log('Fetching coaster');
 
   if (!inputDocument) {

@@ -11,7 +11,9 @@ async function verify(token: string) {
   return true;
 }
 
-const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest, inputDocument): Promise<void> {
+const httpTrigger: AzureFunction = async function (
+  context: Context, req: HttpRequest, inputDocument,
+): Promise<void> {
   context.log('Adding a coaster');
   if (!req.body) {
     context.res = { status: 401 };
