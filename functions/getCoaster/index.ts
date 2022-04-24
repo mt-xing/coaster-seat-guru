@@ -1,7 +1,9 @@
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
+import { CoasterDoc } from '../types/cosmos';
+import { GetCoasterResponse } from '../types/getCoaster';
 
 const httpTrigger: AzureFunction = function (
-	context: Context, req: HttpRequest, inputDocument,
+	context: Context, req: HttpRequest, inputDocument: CoasterDoc,
 ): void {
 	context.log('Fetching coaster');
 
@@ -12,7 +14,7 @@ const httpTrigger: AzureFunction = function (
 		return;
 	}
 
-	const resp = {
+	const resp: GetCoasterResponse = {
 		id: inputDocument.id,
 		name: inputDocument.name,
 		park: inputDocument.park,
@@ -23,7 +25,6 @@ const httpTrigger: AzureFunction = function (
 	};
 
 	context.res = {
-		// status: 200, /* Defaults to 200 */
 		body: JSON.stringify(resp),
 	};
 };

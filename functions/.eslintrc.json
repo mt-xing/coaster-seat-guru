@@ -26,6 +26,7 @@
         "function-paren-newline": ["error", "consistent"],
         "indent": ["error", "tab"],
         "no-tabs": "off",
+        "import/extensions": ["error", "never"],
 
         "no-unused-vars": "off",
         "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
