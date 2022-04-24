@@ -1,0 +1,57 @@
+{
+  "bindings": [
+    {
+      "authLevel": "anonymous",
+      "type": "httpTrigger",
+      "direction": "in",
+      "name": "req",
+      "methods": [
+        "post"
+      ]
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "res"
+    },
+    {
+      "type": "cosmosDB",
+      "direction": "in",
+      "name": "inputDocument",
+      "databaseName": "csg",
+      "collectionName": "Coasters",
+      "connectionStringSetting": "CosmosDbConnectionString",
+      "id": "{Query.id}",
+      "partitionKey": "{Query.id}"
+    },
+    {
+      "type": "cosmosDB",
+      "direction": "out",
+      "name": "outputDocument",
+      "databaseName": "csg",
+      "collectionName": "Coasters",
+      "createIfNotExists": false,
+      "connectionStringSetting": "CosmosDbConnectionString"
+    },
+    {
+      "type": "cosmosDB",
+      "direction": "in",
+      "name": "userDocument",
+      "databaseName": "csg",
+      "collectionName": "Users",
+      "connectionStringSetting": "CosmosDbConnectionString",
+      "id": "{Query.uid}",
+      "partitionKey": "{Query.uid}"
+    },
+    {
+      "type": "cosmosDB",
+      "direction": "out",
+      "name": "outputUserDocument",
+      "databaseName": "csg",
+      "collectionName": "Users",
+      "createIfNotExists": false,
+      "connectionStringSetting": "CosmosDbConnectionString"
+    }
+  ],
+  "scriptFile": "../dist/vote/index.js"
+}
