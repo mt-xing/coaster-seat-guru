@@ -1,5 +1,7 @@
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import { OAuth2Client } from 'google-auth-library';
+import { CoasterDoc } from '../types/cosmos';
+import { VotePayload } from '../types/vote';
 
 const client = new OAuth2Client('707815788715-v292qtutlmval10742tekpbnv2a6to6l.apps.googleusercontent.com');
 
@@ -12,26 +14,20 @@ async function verify(token: string) {
 }
 
 type UserDoc = {
-    id: string, submitted: Record<string, (number|null)[][]>
-  };
+	id: string, submitted: Record<number, (number|null)[][]>
+};
 
 class User {
-	/** @type {string} */
-	#sub;
+	#sub: string;
 
-	/** @type {UserDoc | undefined} */
-	#doc;
+	#doc: UserDoc | undefined;
 
 	constructor(sub: string, doc: UserDoc | undefined) {
 		this.#sub = sub;
 		this.#doc = doc;
 	}
 
-	/**
-       * @param {string} coasterId
-       * @returns {(number|null)[][] | null}
-       */
-	getVotes(coasterId) {
+	getVotes(coasterId: number): (number|null)[][] | null {
 		if (!this.#doc) {
 			return null;
 		}
@@ -42,12 +38,7 @@ class User {
 		return c;
 	}
 
-	/**
-       * @param {string} coasterId
-       * @param {(number|null)[][]} votes
-       * @returns {UserDoc}
-       */
-	updateVotes(coasterId, votes) {
+	updateVotes(coasterId: number, votes: (number|null)[][]): UserDoc {
 		if (!this.#doc) {
 			this.#doc = {
 				id: this.#sub,
@@ -60,7 +51,7 @@ class User {
 }
 
 const httpTrigger: AzureFunction = async function (
-	context: Context, req: HttpRequest, inputDocument, userDocument,
+	context: Context, req: HttpRequest, inputDocument: CoasterDoc, userDocument: UserDoc,
 ): Promise<void> {
 	context.log('Saving changes to coaster');
 
@@ -71,7 +62,8 @@ const httpTrigger: AzureFunction = async function (
 		return;
 	}
 
-	const { token, votes } = req.body;
+	const body = req.body as VotePayload;
+	const { token, votes } = body;
 	if (!token || !votes) {
 		context.res = { status: 401 };
 		return;
