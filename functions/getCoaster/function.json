@@ -24,5 +24,6 @@
       "id": "{Query.id}",
       "partitionKey": "{Query.id}"
     }
-  ]
+  ],
+  "scriptFile": "../dist/getCoaster/index.js"
 }

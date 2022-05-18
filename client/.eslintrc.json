@@ -39,6 +39,7 @@
       "no-continue": "off",
       "func-names": "off",
       "no-void": "off",
+      "import/no-extraneous-dependencies": ["off"],
 
       "comma-dangle": "off",
       "@typescript-eslint/comma-dangle": ["error", "only-multiline"],

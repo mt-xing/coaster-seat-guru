@@ -3,13 +3,13 @@
         "source.fixAll.eslint": true
     },
     "eslint.validate": ["javascript"],
-    "eslint.workingDirectories": ["./client"],
+    "eslint.workingDirectories": ["./client", "./functions"],
     "files.eol": "\n",
     "editor.tabSize": 4,
     "editor.insertSpaces": false,
     "azureFunctions.deploySubpath": "functions",
     "azureFunctions.postDeployTask": "npm install (functions)",
-    "azureFunctions.projectLanguage": "JavaScript",
+    "azureFunctions.projectLanguage": "TypeScript",
     "azureFunctions.projectRuntime": "~4",
     "debug.internalConsoleOptions": "neverOpen",
     "azureFunctions.preDeployTask": "npm prune (functions)"

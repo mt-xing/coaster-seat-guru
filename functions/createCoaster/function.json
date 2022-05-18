@@ -6,7 +6,7 @@
       "direction": "in",
       "name": "req",
       "methods": [
-        "get"
+        "post"
       ]
     },
     {
@@ -16,12 +16,23 @@
     },
     {
       "type": "cosmosDB",
+      "direction": "out",
+      "name": "outputDocument",
+      "databaseName": "csg",
+      "collectionName": "Coasters",
+      "createIfNotExists": false,
+      "connectionStringSetting": "CosmosDbConnectionString"
+    },
+    {
+      "type": "cosmosDB",
       "direction": "in",
       "name": "inputDocument",
       "databaseName": "csg",
       "collectionName": "Coasters",
       "connectionStringSetting": "CosmosDbConnectionString",
-      "sqlQuery": "SELECT * FROM c WHERE CONTAINS(c.searchName, {q})"
+      "id": "{Query.id}",
+      "partitionKey": "{Query.id}"
     }
-  ]
+  ],
+  "scriptFile": "../dist/createCoaster/index.js"
 }

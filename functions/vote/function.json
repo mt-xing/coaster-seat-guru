@@ -52,5 +52,6 @@
       "createIfNotExists": false,
       "connectionStringSetting": "CosmosDbConnectionString"
     }
-  ]
+  ],
+  "scriptFile": "../dist/vote/index.js"
 }

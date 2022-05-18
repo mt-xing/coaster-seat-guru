@@ -5,6 +5,7 @@ import {
 	useCallback, useEffect, useMemo, useState
 } from 'react';
 import Link from 'next/link';
+import { CreateCoasterPayload } from '@apiTypes/createCoaster';
 import Footer from '../../components/footer';
 import Header from '../../components/header';
 import { assertUnreachable } from '../../utils/assert';
@@ -112,16 +113,17 @@ function SubmitCoasterPage() {
 		const { token } = state;
 		setState({ ...state, submitting: true });
 		void (async () => {
+			const body: CreateCoasterPayload = {
+				token,
+				rcdb,
+				name,
+				park,
+				rows,
+				cols,
+			};
 			const r = await fetch(`${API_ENDPOINT}CreateCoaster?id=${id}`, {
 				method: 'POST',
-				body: JSON.stringify({
-					token,
-					rcdb,
-					name,
-					park,
-					rows,
-					cols,
-				}),
+				body: JSON.stringify(body),
 			});
 			if (r.ok) {
 				setState({ s: 'Done', id });

@@ -3,9 +3,24 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "func start"
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prestart": "npm run build",
+    "start": "func start",
+    "test": "echo \"No tests yet...\""
   },
   "dependencies": {
-    "google-auth-library": "^7.14.0"
+    "@azure/functions": "^3.0.0",
+    "google-auth-library": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.26",
+    "@typescript-eslint/eslint-plugin": "^5.20.0",
+    "@typescript-eslint/parser": "^5.20.0",
+    "eslint": "^8.14.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-import-resolver-typescript": "^2.7.1",
+    "eslint-plugin-import": "^2.26.0",
+    "typescript": "^4.0.0"
   }
 }

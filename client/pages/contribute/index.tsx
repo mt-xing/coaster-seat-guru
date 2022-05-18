@@ -7,6 +7,7 @@ import { SyncLoader } from 'react-spinners';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import jwtDecode from 'jwt-decode';
+import { VotePayload } from '@apiTypes/vote';
 import Footer from '../../components/footer';
 import Header from '../../components/header';
 import { assertUnreachable } from '../../utils/assert';
@@ -18,6 +19,8 @@ import { getAuth, storeAuth } from '../../utils/auth';
 import AuthWrapper from '../../components/authWrapper';
 import AuthBlocker from '../../components/authBlocker';
 
+type Step = 1 | 2 | 3;
+
 type ResultsState = {
 	s: 'Unauthenticated',
 } | {
@@ -28,8 +31,8 @@ type ResultsState = {
 } | ({
 	s: 'Ready',
 	token: string,
-	step: 1 | 2 | 3,
-	selected: (number | undefined)[][],
+	step: Step,
+	selected: (Step | undefined)[][],
 	submitting: boolean,
 } & QueryResult) | {
 	s: 'Done',
@@ -63,7 +66,7 @@ function VotePage() {
 		setState({ s: 'Not Found' });
 	}, []);
 
-	const setStep = useCallback((step: 1 | 2 | 3) => {
+	const setStep = useCallback((step: Step) => {
 		if (state.s !== 'Ready') { return; }
 		setState({ ...state, step });
 	}, [state]);
@@ -132,7 +135,7 @@ function VotePage() {
 		}
 	}, [state, handleCredentialResponse, id, notFound, idReady]);
 
-	const changeSelected = useCallback((r: number, c: number, val: number | undefined) => {
+	const changeSelected = useCallback((r: number, c: number, val: Step | undefined) => {
 		if (state.s !== 'Ready') { throw new Error(); }
 		const t = state.selected.slice();
 		t[r] = state.selected[r].slice();
@@ -159,12 +162,13 @@ function VotePage() {
 		if (state.submitting) { return; }
 		setState({ ...state, submitting: true });
 		void (async () => {
+			const body: VotePayload = {
+				token: state.token,
+				votes: state.selected.map((row) => row.map((vote) => (vote === undefined ? null : vote))),
+			};
 			const r = await fetch(`${API_ENDPOINT}Vote?id=${state.id}&uid=${jwtDecode<{sub: string}>(state.token).sub}`, {
 				method: 'POST',
-				body: JSON.stringify({
-					token: state.token,
-					votes: state.selected.map((row) => row.map((vote) => (vote === undefined ? null : vote))),
-				}),
+				body: JSON.stringify(body),
 			});
 			if (r.ok) {
 				setState({ s: 'Done', id: state.id });

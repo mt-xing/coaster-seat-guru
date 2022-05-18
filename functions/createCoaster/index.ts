@@ -1,35 +1,31 @@
-const { OAuth2Client } = require('google-auth-library');
+import { AzureFunction, Context, HttpRequest } from '@azure/functions';
+import { verifyToken } from '../model/auth';
+import { CreateCoasterPayload } from '../types/createCoaster';
 
-const client = new OAuth2Client('707815788715-v292qtutlmval10742tekpbnv2a6to6l.apps.googleusercontent.com');
-
-async function verify(token) {
-	const ticket = await client.verifyIdToken({
-		idToken: token,
-		audience: '707815788715-v292qtutlmval10742tekpbnv2a6to6l.apps.googleusercontent.com',
-	});
-	return true;
-}
-
-module.exports = async function (context, req, inputDocument) {
+const httpTrigger: AzureFunction = async function (
+	context: Context, req: HttpRequest, inputDocument,
+): Promise<void> {
 	context.log('Adding a coaster');
 	if (!req.body) {
 		context.res = { status: 401 };
 		return;
 	}
 
-	const { token } = req.body;
+	const body = req.body as CreateCoasterPayload;
+
+	const { token, rcdb } = body;
 	if (!token) {
 		context.res = { status: 401 };
 		return;
 	}
 	try {
-		await verify(token);
+		await verifyToken(token);
 	} catch (e) {
 		context.res = { status: 401 };
 		return;
 	}
 
-	const rcdbMatch = /http(?:s?):\/\/rcdb.com\/([\d]+)\.htm/.exec(req.body.rcdb);
+	const rcdbMatch = /http(?:s?):\/\/rcdb.com\/([\d]+)\.htm/.exec(rcdb);
 	if (rcdbMatch === null) {
 		context.res = { status: 400 };
 		return;
@@ -44,9 +40,9 @@ module.exports = async function (context, req, inputDocument) {
 		context.res = { status: 409 };
 		return;
 	}
-	const { name, park } = req.body;
-	const rows = parseInt(req.body.rows, 10);
-	const cols = parseInt(req.body.cols, 10);
+	const {
+		name, park, rows, cols,
+	} = body;
 
 	if (!name || !park || !rows || !cols) {
 		context.res = { status: 400 };
@@ -61,7 +57,7 @@ module.exports = async function (context, req, inputDocument) {
 		rows,
 		cols,
 		data: Array.from(Array(rows).keys()).map(
-			(_) => Array.from(Array(cols).keys()).map((y) => [0, 0, 0]),
+			(_) => Array.from(Array(cols).keys()).map((_y) => [0, 0, 0]),
 		),
 		total: 0,
 	});
@@ -70,3 +66,5 @@ module.exports = async function (context, req, inputDocument) {
 		status: 200,
 	};
 };
+
+export default httpTrigger;

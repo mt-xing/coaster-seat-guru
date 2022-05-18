@@ -1,66 +1,12 @@
-const { OAuth2Client } = require('google-auth-library');
+import { AzureFunction, Context, HttpRequest } from '@azure/functions';
+import { getTokenSubject } from '../model/auth';
+import { User, UserDoc } from '../model/user';
+import { CoasterDoc } from '../types/cosmos';
+import { VotePayload } from '../types/vote';
 
-const client = new OAuth2Client('707815788715-v292qtutlmval10742tekpbnv2a6to6l.apps.googleusercontent.com');
-
-async function verify(token) {
-	const ticket = await client.verifyIdToken({
-		idToken: token,
-		audience: '707815788715-v292qtutlmval10742tekpbnv2a6to6l.apps.googleusercontent.com',
-	});
-	return ticket.getPayload().sub;
-}
-
-/** @typedef {{id: string, submitted: Record<string, (number|null)[][]>}} UserDoc */
-
-class User {
-	/** @type {string} */
-	#sub;
-
-	/** @type {UserDoc | undefined} */
-	#doc;
-
-	/**
-	 * @param {string} sub
-	 * @param {UserDoc | undefined} doc
-	 */
-	constructor(sub, doc) {
-		this.#sub = sub;
-		this.#doc = doc;
-	}
-
-	/**
-	 * @param {string} coasterId
-	 * @returns {(number|null)[][] | null}
-	 */
-	getVotes(coasterId) {
-		if (!this.#doc) {
-			return null;
-		}
-		const c = this.#doc.submitted[coasterId];
-		if (!c) {
-			return null;
-		}
-		return c;
-	}
-
-	/**
-	 * @param {string} coasterId
-	 * @param {(number|null)[][]} votes
-	 * @returns {UserDoc}
-	 */
-	updateVotes(coasterId, votes) {
-		if (!this.#doc) {
-			this.#doc = {
-				id: this.#sub,
-				submitted: {},
-			};
-		}
-		this.#doc.submitted[coasterId] = votes;
-		return this.#doc;
-	}
-}
-
-module.exports = async function (context, req, inputDocument, userDocument) {
+const httpTrigger: AzureFunction = async function (
+	context: Context, req: HttpRequest, inputDocument: CoasterDoc, userDocument: UserDoc,
+): Promise<void> {
 	context.log('Saving changes to coaster');
 
 	if (!inputDocument) {
@@ -70,14 +16,15 @@ module.exports = async function (context, req, inputDocument, userDocument) {
 		return;
 	}
 
-	const { token, votes } = req.body;
+	const body = req.body as VotePayload;
+	const { token, votes } = body;
 	if (!token || !votes) {
 		context.res = { status: 401 };
 		return;
 	}
 	const uid = await (async () => {
 		try {
-			return await verify(token);
+			return await getTokenSubject(token);
 		} catch (e) {
 			return null;
 		}
@@ -146,7 +93,6 @@ module.exports = async function (context, req, inputDocument, userDocument) {
 				break;
 			default:
 				context.res = { status: 400 };
-				return;
 			}
 		});
 	});
@@ -168,3 +114,5 @@ module.exports = async function (context, req, inputDocument, userDocument) {
 		status: 200,
 	};
 };
+
+export default httpTrigger;
