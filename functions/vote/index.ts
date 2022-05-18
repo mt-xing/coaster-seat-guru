@@ -1,54 +1,8 @@
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
-import { OAuth2Client } from 'google-auth-library';
+import { getTokenSubject } from '../model/auth';
+import { User, UserDoc } from '../model/user';
 import { CoasterDoc } from '../types/cosmos';
 import { VotePayload } from '../types/vote';
-
-const client = new OAuth2Client('707815788715-v292qtutlmval10742tekpbnv2a6to6l.apps.googleusercontent.com');
-
-async function verify(token: string) {
-	const ticket = await client.verifyIdToken({
-		idToken: token,
-		audience: '707815788715-v292qtutlmval10742tekpbnv2a6to6l.apps.googleusercontent.com',
-	});
-	return ticket.getPayload().sub;
-}
-
-type UserDoc = {
-	id: string, submitted: Record<number, (number|null)[][]>
-};
-
-class User {
-	#sub: string;
-
-	#doc: UserDoc | undefined;
-
-	constructor(sub: string, doc: UserDoc | undefined) {
-		this.#sub = sub;
-		this.#doc = doc;
-	}
-
-	getVotes(coasterId: number): (number|null)[][] | null {
-		if (!this.#doc) {
-			return null;
-		}
-		const c = this.#doc.submitted[coasterId];
-		if (!c) {
-			return null;
-		}
-		return c;
-	}
-
-	updateVotes(coasterId: number, votes: (number|null)[][]): UserDoc {
-		if (!this.#doc) {
-			this.#doc = {
-				id: this.#sub,
-				submitted: {},
-			};
-		}
-		this.#doc.submitted[coasterId] = votes;
-		return this.#doc;
-	}
-}
 
 const httpTrigger: AzureFunction = async function (
 	context: Context, req: HttpRequest, inputDocument: CoasterDoc, userDocument: UserDoc,
@@ -70,7 +24,7 @@ const httpTrigger: AzureFunction = async function (
 	}
 	const uid = await (async () => {
 		try {
-			return await verify(token);
+			return await getTokenSubject(token);
 		} catch (e) {
 			return null;
 		}

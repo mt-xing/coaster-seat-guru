@@ -1,16 +1,6 @@
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
-import { OAuth2Client } from 'google-auth-library';
+import { verifyToken } from '../model/auth';
 import { CreateCoasterPayload } from '../types/createCoaster';
-
-const client = new OAuth2Client('707815788715-v292qtutlmval10742tekpbnv2a6to6l.apps.googleusercontent.com');
-
-async function verify(token: string) {
-	await client.verifyIdToken({
-		idToken: token,
-		audience: '707815788715-v292qtutlmval10742tekpbnv2a6to6l.apps.googleusercontent.com',
-	});
-	return true;
-}
 
 const httpTrigger: AzureFunction = async function (
 	context: Context, req: HttpRequest, inputDocument,
@@ -29,7 +19,7 @@ const httpTrigger: AzureFunction = async function (
 		return;
 	}
 	try {
-		await verify(token);
+		await verifyToken(token);
 	} catch (e) {
 		context.res = { status: 401 };
 		return;
