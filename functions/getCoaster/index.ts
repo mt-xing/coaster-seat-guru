@@ -2,9 +2,9 @@ import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import { CoasterDoc } from '../types/cosmos';
 import { GetCoasterResponse } from '../types/getCoaster';
 
-const httpTrigger: AzureFunction = function (
+const httpTrigger: AzureFunction = async function (
 	context: Context, req: HttpRequest, inputDocument: CoasterDoc,
-): void {
+): Promise<void> {
 	context.log('Fetching coaster');
 
 	if (!inputDocument) {
