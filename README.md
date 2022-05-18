@@ -13,7 +13,7 @@ Use `npm run build` to build the production site, which lives in `/docs` and is 
 
 ## Backend
 
-Backend consists of Azure Functions, with data in Cosmos DB.
+Backend consists of Azure Functions, with data in Cosmos DB, written in TypeScript.
 Code is in the `/functions` folder.
 Run `npm start` in the `/functions` folder to start a local copy of the functions.
 Note that you'll need your own Cosmos instance to test with; see Microsoft's docs for hooking that up locally.
