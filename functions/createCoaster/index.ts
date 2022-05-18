@@ -52,7 +52,7 @@ const httpTrigger: AzureFunction = async function (
 	context.bindings.outputDocument = JSON.stringify({
 		id,
 		name,
-		searchName: name.replace(/[\W_]+/g, '').toLowerCase(),
+		searchName: `${name}${park}`.replace(/[\W_]+/g, '').toLowerCase(),
 		park,
 		rows,
 		cols,
