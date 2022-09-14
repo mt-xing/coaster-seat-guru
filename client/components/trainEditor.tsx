@@ -84,7 +84,7 @@ export default function TrainEditor(props: TrainProps) {
 					{
 						(typeof rowsPerCar === 'number' ? ((rI + 1) % rowsPerCar === 0) : (rowsPerCar.indexOf(rI) !== -1))
 						&& rI !== (props.rows - 1)
-							? <tr><td key='del' style={{ height: '1px' }}><button className={`${styles.rowBtn} ${styles.del}`} onClick={() => mergeRow(rI)}>🗙</button></td><td colSpan={props.cols} style={{ height: '1px', background: 'red' }}></td></tr>
+							? <tr><td key='del' style={{ height: '1px' }} colSpan={props.cols + 1}><button className={`${styles.rowBtn} ${styles.del}`} onClick={() => mergeRow(rI)}><span>🗙</span></button></td></tr>
 							: <tr><td key='add' style={{ height: '1px' }} colSpan={props.cols + 1}><button className={`${styles.rowBtn} ${styles.add}`} onClick={() => splitRow(rI)}><span>+</span></button></td></tr>
 					}
 				</Fragment>)}

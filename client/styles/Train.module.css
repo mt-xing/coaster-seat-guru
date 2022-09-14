@@ -66,23 +66,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-}
 
-.trainEdit button.del {
-    top: 50%;
-    right: 0;
-    transform: translate(3px, -50%);
-    font-size: 10px;
-    padding-bottom: 2px;
-    width: 15px;
-    border-radius: 15px;
-}
-
-.trainEdit button.add {
     margin: 0 auto;
     width: 100%;
     transform: translateY(-50%);
+}
 
+.trainEdit button.del {
+    font-size: 10px;
+}
+
+.trainEdit button.add {
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
 }
@@ -91,19 +85,26 @@
     opacity: 1;
 }
 
-.trainEdit button.add span {
+.trainEdit button.rowBtn span {
     background: white;
     padding: 0 5px;
 }
 
-.trainEdit button.add::after {
+.trainEdit button.rowBtn::after {
     content: '';
     display: block;
     position: absolute;
     left: 0; top: 50%; right: 0;
-    background: green;
     height: 1px;
     z-index: -1;
+}
+
+.trainEdit button.add::after {
+    border-top: 1px green dotted;
+}
+
+.trainEdit button.del::after {
+    border-top: 1px red solid;
 }
 
 .trainEdit button.rowBtn::before {
@@ -116,6 +117,7 @@
 
     color: white;
     padding: 2px 5px;
+    left: -5px;
 
     pointer-events: none;
 
@@ -133,7 +135,6 @@
 .trainEdit button.add::before {
     content: 'Split car';
     background: green;
-    left: -5px;
 }
 
 .trainEdit button.rowBtn:hover::before, .trainEdit button.rowBtn:focus::before {
