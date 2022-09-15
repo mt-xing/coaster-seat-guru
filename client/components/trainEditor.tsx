@@ -1,5 +1,5 @@
 import {
-	ChangeEvent, Fragment, useCallback, useState
+	ChangeEvent, Fragment, useCallback, useMemo, useState
 } from 'react';
 import styles from '../styles/Train.module.css';
 
@@ -16,9 +16,18 @@ export default function TrainEditor(props: TrainProps) {
 	const rows = Array.from(Array(props.rows).keys());
 	const cols = Array.from(Array(props.cols).keys());
 
+	const allCarsSame = useMemo(() => {
+		if (typeof rowsPerCar === 'number') {
+			return true;
+		}
+		if (rowsPerCar.length === 0) { return true; }
+		const carLength = rowsPerCar[0] + 1;
+		return rowsPerCar.every((x, i, a) => i === 0 || (x - a[i - 1]) === carLength);
+	}, [rowsPerCar]);
+
 	const setRows = useCallback((evt: ChangeEvent<HTMLSelectElement>) => {
 		if (evt.target.value !== 'Custom') {
-			if (typeof rowsPerCar !== 'number') {
+			if (typeof rowsPerCar !== 'number' && !allCarsSame) {
 				// eslint-disable-next-line no-restricted-globals, no-alert
 				if (!confirm('This will overwrite any modifications you\'ve made to specific cars and reset all cars to match the first one. Are you sure you want to continue?')) {
 					// TODO: check for per-car modifications
@@ -77,7 +86,7 @@ export default function TrainEditor(props: TrainProps) {
 						{cols.map((c) => <td key={c}>
 							<div
 								className='seat'
-								style={{ backgroundColor: 'rgb(128,128,128)', height: '100%' }}
+								style={{ backgroundColor: 'rgb(128,128,128)', height: '30px', width: '30px' }}
 							></div>
 						</td>)}
 					</tr>
