@@ -13,8 +13,12 @@ export default function TrainEditor(props: TrainProps) {
 	// INCLUDING last car; length === number of cars
 	const [rowsPerCar, setRowsPerCar] = useState<number | number[]>(1);
 
-	const rows = Array.from(Array(props.rows).keys());
-	const cols = Array.from(Array(props.cols).keys());
+	const rows = useMemo(() => Array.from(Array(props.rows).keys()), [props.rows]);
+	const cols = useMemo(() => Array.from(Array(props.cols).keys()), [props.cols]);
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const dummySpacings = useMemo(() => rows.map((_) => cols.map((_2) => true)), [rows, cols]);
+
+	const [spacings, setSpacings] = useState<boolean[][]>(dummySpacings);
 
 	const allCarsSame = useMemo(() => {
 		if (typeof rowsPerCar === 'number') {
@@ -30,7 +34,6 @@ export default function TrainEditor(props: TrainProps) {
 			if (typeof rowsPerCar !== 'number' && !allCarsSame) {
 				// eslint-disable-next-line no-restricted-globals, no-alert
 				if (!confirm('This will overwrite any modifications you\'ve made to specific cars and reset all cars to match the first one. Are you sure you want to continue?')) {
-					// TODO: check for per-car modifications
 					return;
 				}
 			}
@@ -41,7 +44,7 @@ export default function TrainEditor(props: TrainProps) {
 			return;
 		}
 		setRowsPerCar(rows.filter((i) => (i + 1) % rowsPerCar === 0));
-	}, [rowsPerCar, rows]);
+	}, [rowsPerCar, rows, allCarsSame]);
 
 	const mergeRow = useCallback((row: number) => {
 		if (typeof rowsPerCar === 'number') {
@@ -63,11 +66,22 @@ export default function TrainEditor(props: TrainProps) {
 				// TODO: check for per-car modifications
 				return;
 			}
-			setRowsPerCar(rows.filter((i) => (i + 1) % rowsPerCar === 0).concat(row).sort());
+			setRowsPerCar(rows
+				.filter((i) => (i + 1) % rowsPerCar === 0)
+				.concat(row)
+				.sort((a, b) => a - b));
 		} else {
-			setRowsPerCar(rowsPerCar.concat(row).sort());
+			setRowsPerCar(rowsPerCar.concat(row).sort((a, b) => a - b));
 		}
 	}, [rowsPerCar, rows]);
+
+	const addSpace = useCallback((row: number, seat: number) => {
+		const r = spacings[row];
+		const newR = r.slice(0, seat + 1).concat(false).concat(r.slice(seat + 1, r.length));
+		const newSpacings = spacings.slice();
+		newSpacings[row] = newR;
+		setSpacings(newSpacings);
+	}, [spacings]);
 
 	return <section className={`${styles.coaster} ${styles.trainEdit}`}>
 		<p>Rows per car: <select onChange={setRows} value={typeof rowsPerCar === 'number' ? rowsPerCar : 'Custom'}>{
@@ -80,24 +94,63 @@ export default function TrainEditor(props: TrainProps) {
 		<p>Front of train</p>
 		<table className={styles.coasterTrain}>
 			<tbody>
-				{rows.map((r, rI) => <Fragment key={r}>
+				{spacings.map((colSpacings, r) => <Fragment key={r}>
 					<tr>
 						<td>{r + 1}</td>
-						{cols.map((c) => <td key={c}>
-							<div
-								className='seat'
-								style={{ backgroundColor: 'rgb(128,128,128)', height: '30px', width: '30px' }}
-							></div>
-						</td>)}
+						<td><div>
+							{colSpacings.map((seat, c) => <Fragment key={c}>
+								{seat ? <><div
+									className='seat'
+									style={{
+										backgroundColor: 'rgb(128,128,128)', height: '30px', width: '30px', margin: '0 5px', display: 'inline-block', verticalAlign: 'middle'
+									}}
+								></div></> : <div style={{
+									height: '30px', width: '30px', margin: 0, display: 'inline-block', verticalAlign: 'middle'
+								}}>•</div>
+								}
+								{ c !== (colSpacings.length - 1)
+									? <div className={styles.spaceAdd} style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+										<button onClick={() => addSpace(r, c)}>+</button>
+									</div>
+									: null }
+							</Fragment>)}
+						</div></td>
 					</tr>
-					{
-						(typeof rowsPerCar === 'number' ? ((rI + 1) % rowsPerCar === 0) : (rowsPerCar.indexOf(rI) !== -1))
-						&& rI !== (props.rows - 1)
-							? <tr><td key='del' style={{ height: '1px' }} colSpan={props.cols + 1}><button className={`${styles.rowBtn} ${styles.del}`} onClick={() => mergeRow(rI)}><span>🗙</span></button></td></tr>
-							: <tr><td key='add' style={{ height: '1px' }} colSpan={props.cols + 1}><button className={`${styles.rowBtn} ${styles.add}`} onClick={() => splitRow(rI)}><span>+</span></button></td></tr>
+					{r !== (props.rows - 1)
+						? <RowEdit
+							rowsPerCar={rowsPerCar}
+							r={r}
+							cols={props.cols}
+							mergeRow={mergeRow}
+							splitRow={splitRow}
+						/> : null
 					}
 				</Fragment>)}
 			</tbody>
 		</table>
 	</section>;
+}
+
+function RowEdit(props: {
+	rowsPerCar: number | number[],
+	r: number,
+	cols: number,
+	mergeRow: (x: number) => void,
+	splitRow: (x: number) => void,
+}) {
+	const {
+		rowsPerCar, r, cols, mergeRow, splitRow
+	} = props;
+	const merge = useCallback(() => mergeRow(r), [r, mergeRow]);
+	const split = useCallback(() => splitRow(r), [r, splitRow]);
+
+	const isDel = (typeof rowsPerCar === 'number' ? ((r + 1) % rowsPerCar === 0) : (rowsPerCar.indexOf(r) !== -1));
+
+	return <tr>
+		<td key={isDel ? 'del' : 'add'} style={{ height: '1px' }} colSpan={2 * cols}>
+			<button className={`${styles.rowBtn} ${isDel ? styles.del : styles.add}`} onClick={isDel ? merge : split}>
+				<span>{isDel ? '🗙' : '+'}</span>
+			</button>
+		</td>
+	</tr>;
 }

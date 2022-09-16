@@ -52,6 +52,8 @@
 .trainEdit td {
     position: relative;
     overflow: visible;
+    text-align: center;
+    width: initial;
 }
 
 .trainEdit button.rowBtn {
@@ -145,4 +147,46 @@
 
 .trainEdit button.rowBtn:active {
     color: white;
+}
+
+.trainEdit .spaceAdd {
+    width: 0;
+    height: 30px;
+    position: relative;
+}
+
+.trainEdit .spaceAdd button {
+    position: absolute;
+
+    background: none;
+    box-shadow: none;
+    left: 50%;
+    top: 50%;
+    padding: 0;
+    width: 15px;
+    transform: translate(-50%, -50%);
+}
+
+.trainEdit .spaceAdd button::after {
+    content: 'Add space';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    background: white;
+    color: black;
+    padding: 2px 5px;
+    box-shadow: black 0 0 5px 1px;
+
+    opacity: 0;
+    transform: scaleY(0)translateX(-50%);
+    pointer-events: none;
+    transform-origin: bottom center;
+
+    transition: opacity 0.5s ease-in, transform 0.5s ease-in;
+}
+
+.trainEdit .spaceAdd button:hover::after, .trainEdit .spaceAdd button:focus::after {
+    opacity: 1;
+    transform: scaleY(1)translateX(-50%);
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
 }
