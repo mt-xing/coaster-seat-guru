@@ -260,7 +260,7 @@ function DeleteSpaceBtn(props: {
 	const rem = useCallback(() => removeSpace(r, c), [removeSpace, r, c]);
 	return <div className={styles.spaceDel}>{
 		(state.type !== 'standard' || r < state.rowsPerCar)
-			? <button onClick={rem}>X</button>
+			? <button onClick={rem}><span>🗙</span></button>
 			: <>•</>
 	}</div>;
 }

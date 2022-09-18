@@ -214,3 +214,8 @@
 .trainEdit .spaceDel button:active {
     border: none;
 }
+
+.trainEdit .spaceDel button span {
+    display: inline-block;
+    margin-top: -1px;
+}
