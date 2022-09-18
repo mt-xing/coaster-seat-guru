@@ -2,7 +2,8 @@ import {
 	ChangeEvent, Fragment, useCallback, useMemo, useState
 } from 'react';
 import {
-	allCarsSame as allCarsSameFn, allCarsSameLength, convertSameToCustomFull, convertSameToCustomKeepCar, TrainEditorState
+	allCarsSame as allCarsSameFn,
+	allCarsSameLength, convertSameToCustomFull, convertSameToCustomKeepCar, TrainEditorState
 } from 'model/trainEditorState';
 import { assertUnreachable } from 'utils/assert';
 import styles from '../styles/Train.module.css';
