@@ -116,23 +116,25 @@ export default function TrainEditor(props: TrainProps) {
 		);
 	}, [state, rows, rowEditHelper]);
 
+	const spaceEdit = useCallback((row: number, newRow: boolean[]) => {
+		const newSpacings = state.spacings.slice();
+		newSpacings[row] = newRow;
+		setState({ ...state, spacings: newSpacings });
+	}, [state]);
+
 	const addSpace = useCallback((row: number, seat: number) => {
 		const r = state.spacings[row];
 		const newR = r.slice(0, seat + 1).concat(false).concat(r.slice(seat + 1));
-		const newSpacings = state.spacings.slice();
-		newSpacings[row] = newR;
-		setState({ ...state, spacings: newSpacings });
-	}, [state]);
+		spaceEdit(row, newR);
+	}, [state, spaceEdit]);
 
 	const removeSpace = useCallback((row: number, col: number) => {
 		const r = state.spacings[row];
 		// eslint-disable-next-line no-console
 		if (r[col]) { console.error('Invalid space'); return; }
 		const newR = r.slice(0, col).concat(r.slice(col + 1));
-		const newSpacings = state.spacings.slice();
-		newSpacings[row] = newR;
-		setState({ ...state, spacings: newSpacings });
-	}, [state]);
+		spaceEdit(row, newR);
+	}, [state, spaceEdit]);
 
 	const changeToCustom = useCallback((evt: ChangeEvent<HTMLInputElement>) => {
 		const { checked } = evt.currentTarget;
@@ -165,8 +167,6 @@ export default function TrainEditor(props: TrainProps) {
 			assertUnreachable(state);
 		}
 	}, [state, props.rows, allCarsSame]);
-
-	console.log(state);
 
 	return <section className={`${styles.coaster} ${styles.trainEdit}`}>
 		<p>Rows per car: <select onChange={setRows} value={state.type === 'custom' ? 'Custom' : state.rowsPerCar}>{
