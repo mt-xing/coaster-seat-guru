@@ -164,8 +164,10 @@ export default function TrainEditor(props: TrainProps) {
 				.map((r) => <option key={r} value={r + 1}>{r + 1}</option>)
 				.concat(<option key='custom'>Custom</option>)
 		}</select></p>
-		<p><label><input type='checkbox' checked={state.type === 'standard'} onChange={changeToCustom} /> Same design for all cars</label></p>
-
+		{
+			state.type === 'custom' ? null
+				: <p><label><input type='checkbox' checked={state.type === 'standard'} onChange={changeToCustom} /> Same design for all cars</label></p>
+		}
 		<p>Front of train</p>
 		<table className={styles.coasterTrain}>
 			<tbody>
