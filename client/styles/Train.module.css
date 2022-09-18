@@ -247,3 +247,16 @@
 .coasterCar td:nth-child(2) {
     white-space: nowrap;
 }
+
+.coasterTrain .carOptions {
+    font-size: 14px;
+}
+
+.coasterTrain .carOptions p {
+    text-align: left;
+}
+
+.coasterTrain .carOptions input[type="checkbox"] {
+    height: 18px;
+    width: 18px;
+}

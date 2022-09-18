@@ -184,10 +184,6 @@ export default function TrainEditor(props: TrainProps) {
 				.map((r) => <option key={r} value={r + 1}>{r + 1}</option>)
 				.concat(<option key='custom'>Custom</option>)
 		}</select></p>
-		{
-			state.type === 'custom' ? null
-				: <p><label><input type='checkbox' checked={state.type === 'standard'} onChange={changeToCustom} /> Same design for all cars</label></p>
-		}
 		<p>Front of train</p>
 		<table className={styles.coasterTrain}>
 			<tbody>
@@ -205,6 +201,7 @@ export default function TrainEditor(props: TrainProps) {
 								splitRow={splitRow}
 								addSpace={addSpace}
 								removeSpace={removeSpace}
+								changeToCustom={changeToCustom}
 							/>)
 					) : (
 						state.rowsPerCar.map((carSplitLoc, carI) => <TrainCar
@@ -218,6 +215,7 @@ export default function TrainEditor(props: TrainProps) {
 							splitRow={splitRow}
 							addSpace={addSpace}
 							removeSpace={removeSpace}
+							changeToCustom={changeToCustom}
 						/>)
 					)
 				}
@@ -237,13 +235,14 @@ function TrainCar(props: {
 	splitRow: (x: number) => void,
 	addSpace: (a: number, b: number) => void,
 	removeSpace: (a: number, b: number) => void,
+	changeToCustom: (evt: ChangeEvent<HTMLInputElement>) => void,
 }) {
 	const rows = useMemo(() => Array.from(Array(props.numRows).keys()), [props.numRows]);
 	const {
-		state, lastCar, mergeRow, splitRow, addSpace, removeSpace
+		state, lastCar, mergeRow, splitRow, addSpace, removeSpace, changeToCustom
 	} = props;
-	return <>
-		<table className={`${styles.coasterTrain} ${styles.coasterCar}`}>
+	return <><tr>
+		<td><table className={`${styles.coasterTrain} ${styles.coasterCar}`}>
 			<tbody>
 				{rows.map((rRaw) => {
 					const r = rRaw + props.startingRow;
@@ -279,7 +278,6 @@ function TrainCar(props: {
 							? <RowEdit
 								rowsPerCar={state.rowsPerCar}
 								r={r}
-								cols={props.cols}
 								mergeRow={mergeRow}
 								splitRow={splitRow}
 							/> : null
@@ -287,29 +285,43 @@ function TrainCar(props: {
 					</Fragment>;
 				})}
 			</tbody>
-		</table>
-		{!lastCar
-			? <RowEdit
-				key={`${props.startingRow}-${props.numRows}`}
-				rowsPerCar={state.rowsPerCar}
-				r={props.numRows - 1 + props.startingRow}
-				cols={props.cols}
-				mergeRow={mergeRow}
-				splitRow={splitRow}
-			/> : null
+		</table></td>
+		<td className={styles.carOptions}>{
+			(props.startingRow === 0 || state.type !== 'standard')
+				? <p><label><input type='checkbox' /> Spinning Car</label></p>
+				: null
+		}{
+			props.startingRow === 0
+				? <p><label><input
+					type='checkbox'
+					checked={state.type === 'standard'}
+					onChange={changeToCustom}
+					disabled={state.type === 'custom'}
+				/> {state.type === 'custom' ? <del>Same design for all cars</del> : 'Same design for all cars'}</label></p>
+				: null
 		}
+		</td>
+	</tr>
+	{!lastCar
+		? <RowEdit
+			key={`${props.startingRow}-${props.numRows}`}
+			rowsPerCar={state.rowsPerCar}
+			r={props.numRows - 1 + props.startingRow}
+			mergeRow={mergeRow}
+			splitRow={splitRow}
+		/> : null
+	}
 	</>;
 }
 
 function RowEdit(props: {
 	rowsPerCar: number | number[],
 	r: number,
-	cols: number,
 	mergeRow: (x: number) => void,
 	splitRow: (x: number) => void,
 }) {
 	const {
-		rowsPerCar, r, cols, mergeRow, splitRow
+		rowsPerCar, r, mergeRow, splitRow
 	} = props;
 	const merge = useCallback(() => mergeRow(r), [r, mergeRow]);
 	const split = useCallback(() => splitRow(r), [r, splitRow]);
@@ -317,7 +329,7 @@ function RowEdit(props: {
 	const isDel = (typeof rowsPerCar === 'number' ? ((r + 1) % rowsPerCar === 0) : (rowsPerCar.indexOf(r) !== -1));
 
 	return <tr>
-		<td key={isDel ? 'del' : 'add'} style={{ height: '1px' }} colSpan={2 * cols}>
+		<td key={isDel ? 'del' : 'add'} style={{ height: '1px' }} colSpan={isDel ? 1 : 2}>
 			<button className={`${styles.rowBtn} ${isDel ? styles.del : styles.add}`} onClick={isDel ? merge : split}>
 				<span>{isDel ? '🗙' : '+'}</span>
 			</button>
