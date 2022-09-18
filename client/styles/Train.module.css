@@ -72,18 +72,16 @@
     margin: 0 auto;
     width: 100%;
     transform: translateY(-50%);
+    
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
 }
 
 .trainEdit button.del {
     font-size: 10px;
 }
 
-.trainEdit button.add {
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-}
-
-.trainEdit button.add:hover {
+.trainEdit button.rowBtn:hover, .trainEdit button.rowBtn:focus {
     opacity: 1;
 }
 
@@ -99,6 +97,10 @@
     left: 0; top: 50%; right: 0;
     height: 1px;
     z-index: -1;
+}
+
+.trainEdit button.add span {
+    background: rgb(230, 230, 230);
 }
 
 .trainEdit button.add::after {
@@ -229,4 +231,19 @@
 .trainEdit .spaceDel button span {
     display: inline-block;
     margin-top: -1px;
+}
+
+.coasterCar {
+    background: rgb(230, 230, 230);
+    border-radius: 10px;
+    width: 100%;
+}
+
+.coasterCar td:first-child {
+    width: 40px;
+    white-space: nowrap;
+}
+
+.coasterCar td:nth-child(2) {
+    white-space: nowrap;
 }

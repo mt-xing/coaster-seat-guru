@@ -182,7 +182,62 @@ export default function TrainEditor(props: TrainProps) {
 		<p>Front of train</p>
 		<table className={styles.coasterTrain}>
 			<tbody>
-				{rows.map((r) => {
+				{
+					state.type !== 'custom' ? (
+						Array.from(Array(props.rows / state.rowsPerCar).keys())
+							.map((i) => <TrainCar
+								key={i}
+								numRows={state.rowsPerCar}
+								cols={props.cols}
+								startingRow={i * state.rowsPerCar}
+								state={state}
+								lastCar={i === props.rows / state.rowsPerCar - 1}
+								mergeRow={mergeRow}
+								splitRow={splitRow}
+								addSpace={addSpace}
+								removeSpace={removeSpace}
+							/>)
+					) : (
+						state.rowsPerCar.map((carSplitLoc, carI) => <TrainCar
+							key={carI}
+							numRows={carI === 0 ? carSplitLoc + 1 : carSplitLoc - state.rowsPerCar[carI - 1]}
+							cols={props.cols}
+							startingRow={carI === 0 ? 0 : state.rowsPerCar[carI - 1] + 1}
+							state={state}
+							lastCar={carI === state.rowsPerCar.length - 1}
+							mergeRow={mergeRow}
+							splitRow={splitRow}
+							addSpace={addSpace}
+							removeSpace={removeSpace}
+						/>)
+					)
+				}
+			</tbody>
+		</table>
+	</section>;
+}
+
+function TrainCar(props: {
+	numRows: number,
+	cols: number,
+	startingRow: number,
+	state: TrainEditorState,
+	lastCar: boolean,
+
+	mergeRow: (x: number) => void,
+	splitRow: (x: number) => void,
+	addSpace: (a: number, b: number) => void,
+	removeSpace: (a: number, b: number) => void,
+}) {
+	const rows = useMemo(() => Array.from(Array(props.numRows).keys()), [props.numRows]);
+	const {
+		state, lastCar, mergeRow, splitRow, addSpace, removeSpace
+	} = props;
+	return <>
+		<table className={`${styles.coasterTrain} ${styles.coasterCar}`}>
+			<tbody>
+				{rows.map((rRaw) => {
+					const r = rRaw + props.startingRow;
 					const colSpacings = state.type === 'standard' ? state.spacings[r % state.rowsPerCar] : state.spacings[r];
 					return <Fragment key={r}>
 						<tr>
@@ -211,7 +266,7 @@ export default function TrainEditor(props: TrainProps) {
 								</Fragment>)}
 							</div></td>
 						</tr>
-						{r !== (props.rows - 1)
+						{rRaw !== props.numRows - 1
 							? <RowEdit
 								rowsPerCar={state.rowsPerCar}
 								r={r}
@@ -224,7 +279,17 @@ export default function TrainEditor(props: TrainProps) {
 				})}
 			</tbody>
 		</table>
-	</section>;
+		{!lastCar
+			? <RowEdit
+				key={`${props.startingRow}-${props.numRows}`}
+				rowsPerCar={state.rowsPerCar}
+				r={props.numRows - 1 + props.startingRow}
+				cols={props.cols}
+				mergeRow={mergeRow}
+				splitRow={splitRow}
+			/> : null
+		}
+	</>;
 }
 
 function RowEdit(props: {
