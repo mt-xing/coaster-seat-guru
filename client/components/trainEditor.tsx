@@ -2,7 +2,7 @@ import {
 	ChangeEvent, Fragment, useCallback, useMemo, useState
 } from 'react';
 import {
-	allCarsSame as allCarsSameFn, allCarsSameLength, convertSameToCustomFull, TrainEditorState
+	allCarsSame as allCarsSameFn, allCarsSameLength, convertSameToCustomFull, convertSameToCustomKeepCar, TrainEditorState
 } from 'model/trainEditorState';
 import { assertUnreachable } from 'utils/assert';
 import styles from '../styles/Train.module.css';
@@ -123,6 +123,38 @@ export default function TrainEditor(props: TrainProps) {
 		setState({ ...state, spacings: newSpacings });
 	}, [state]);
 
+	const changeToCustom = useCallback((evt: ChangeEvent<HTMLInputElement>) => {
+		const { checked } = evt.currentTarget;
+		// eslint-disable-next-line no-console
+		if (state.type === 'custom') { console.error('How did custom train try to change checkbox?'); return; }
+
+		switch (state.type) {
+		case 'standard': {
+			if (checked) { return; }
+			setState(convertSameToCustomKeepCar(state, props.rows));
+			break;
+		}
+		case 'customEvenRows': {
+			if (!checked) { return; }
+			if (!allCarsSame) {
+				// eslint-disable-next-line no-restricted-globals, no-alert
+				if (!confirm('This will reset all cars to match the first one. Are you sure you wish to continue?')) {
+					return;
+				}
+			}
+			setState({
+				type: 'standard',
+				rowsPerCar: state.rowsPerCar,
+				spacings: state.spacings.slice(0, state.rowsPerCar),
+				carDesign: state.carDesign[0],
+			});
+			break;
+		}
+		default:
+			assertUnreachable(state);
+		}
+	}, [state, props.rows, allCarsSame]);
+
 	console.log(state);
 
 	return <section className={`${styles.coaster} ${styles.trainEdit}`}>
@@ -132,6 +164,7 @@ export default function TrainEditor(props: TrainProps) {
 				.map((r) => <option key={r} value={r + 1}>{r + 1}</option>)
 				.concat(<option key='custom'>Custom</option>)
 		}</select></p>
+		<p><label><input type='checkbox' checked={state.type === 'standard'} onChange={changeToCustom} /> Same design for all cars</label></p>
 
 		<p>Front of train</p>
 		<table className={styles.coasterTrain}>
