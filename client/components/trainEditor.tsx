@@ -1,5 +1,5 @@
 import {
-	ChangeEvent, Fragment, useCallback, useMemo, useState
+	ChangeEvent, Fragment, useCallback, useEffect, useMemo, useState
 } from 'react';
 import {
 	allCarsSame as allCarsSameFn,
@@ -17,10 +17,19 @@ export default function TrainEditor(props: TrainProps) {
 	const rows = useMemo(() => Array.from(Array(props.rows).keys()), [props.rows]);
 	const cols = useMemo(() => Array.from(Array(props.cols).keys()), [props.cols]);
 
-	const dummyState = useMemo(() => ({
+	const dummyState = useCallback(() => ({
 		type: 'standard' as const, rowsPerCar: 1, carDesign: 'normal' as const, spacings: [cols.map((_) => true)]
 	}), [cols]);
 	const [state, setState] = useState<TrainEditorState>(dummyState);
+	const numCols = useMemo(() => (
+		state.spacings[0]?.reduce((a, x) => (x ? a + 1 : a), 0) ?? 0
+	), [state.spacings]);
+
+	useEffect(() => {
+		if (props.cols !== numCols) {
+			setState(dummyState());
+		}
+	}, [dummyState, props.cols, numCols]);
 
 	const allCarsSame = useMemo(() => allCarsSameFn(state, props.rows), [state, props.rows]);
 
