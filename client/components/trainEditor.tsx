@@ -75,7 +75,7 @@ export default function TrainEditor(props: TrainProps) {
 			: { ...state, type: 'custom', rowsPerCar: rows.filter((i) => (i + 1) % rowsPerCar === 0) };
 
 		setState(newState);
-	}, [state, props.rows, rows, allCarsSame]);
+	}, [state, props.rows, rows, cols, allCarsSame]);
 
 	const rowEditHelper = useCallback((rowsPerCar: number[]) => {
 		if (state.type !== 'custom') {
