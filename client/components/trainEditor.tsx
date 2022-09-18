@@ -118,7 +118,17 @@ export default function TrainEditor(props: TrainProps) {
 
 	const addSpace = useCallback((row: number, seat: number) => {
 		const r = state.spacings[row];
-		const newR = r.slice(0, seat + 1).concat(false).concat(r.slice(seat + 1, r.length));
+		const newR = r.slice(0, seat + 1).concat(false).concat(r.slice(seat + 1));
+		const newSpacings = state.spacings.slice();
+		newSpacings[row] = newR;
+		setState({ ...state, spacings: newSpacings });
+	}, [state]);
+
+	const removeSpace = useCallback((row: number, col: number) => {
+		const r = state.spacings[row];
+		// eslint-disable-next-line no-console
+		if (r[col]) { console.error('Invalid space'); return; }
+		const newR = r.slice(0, col).concat(r.slice(col + 1));
 		const newSpacings = state.spacings.slice();
 		newSpacings[row] = newR;
 		setState({ ...state, spacings: newSpacings });
@@ -179,14 +189,19 @@ export default function TrainEditor(props: TrainProps) {
 							<td>{r + 1}</td>
 							<td><div>
 								{colSpacings.map((seat, c) => <Fragment key={c}>
-									{seat ? <><div
-										className='seat'
-										style={{
-											backgroundColor: 'rgb(128,128,128)', height: '30px', width: '30px', margin: '0 5px', display: 'inline-block', verticalAlign: 'middle'
-										}}
-									></div></> : <div style={{
-										height: '30px', width: '30px', margin: 0, display: 'inline-block', verticalAlign: 'middle'
-									}}>•</div>
+									{seat
+										? <div
+											className='seat'
+											style={{
+												backgroundColor: 'rgb(128,128,128)',
+												height: '30px',
+												width: '30px',
+												margin: '0 5px',
+												display: 'inline-block',
+												verticalAlign: 'middle'
+											}}
+										></div>
+										: <DeleteSpaceBtn r={r} c={c} state={state} removeSpace={removeSpace} />
 									}
 									{ c !== (colSpacings.length - 1) && (state.type !== 'standard' || r < state.rowsPerCar)
 										? <div className={styles.spaceAdd} style={{ display: 'inline-block', verticalAlign: 'middle' }}>
@@ -234,4 +249,18 @@ function RowEdit(props: {
 			</button>
 		</td>
 	</tr>;
+}
+
+function DeleteSpaceBtn(props: {
+	state:TrainEditorState, r: number, c: number, removeSpace: (r: number, c: number) => void
+}) {
+	const {
+		state, r, c, removeSpace
+	} = props;
+	const rem = useCallback(() => removeSpace(r, c), [removeSpace, r, c]);
+	return <div className={styles.spaceDel}>{
+		(state.type !== 'standard' || r < state.rowsPerCar)
+			? <button onClick={rem}>X</button>
+			: <>•</>
+	}</div>;
 }

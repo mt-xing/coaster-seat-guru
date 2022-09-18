@@ -190,3 +190,27 @@
     transform: scaleY(1)translateX(-50%);
     transition: opacity 0.2s ease-out, transform 0.2s ease-out;
 }
+
+.trainEdit .spaceDel {
+    height: 30px;
+    width: 30px;
+    margin: 0 5px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.trainEdit .spaceDel button {
+    box-sizing: border-box;
+    border: 1px gray solid;
+    box-shadow: none;
+    vertical-align: top;
+    background: none;
+}
+
+.trainEdit .spaceDel button:hover, .trainEdit .spaceDel button:focus {
+    border: 1px black solid;
+}
+
+.trainEdit .spaceDel button:active {
+    border: none;
+}
