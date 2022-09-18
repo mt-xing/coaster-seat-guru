@@ -38,16 +38,12 @@ const printError = (state: unknown) => {
 	}
 };
 
-export function allCarsSame(state: TrainEditorState, rows: number) {
-	if (state.type === 'standard') {
+export function allCarsSameLength(state: TrainEditorState) {
+	if (state.type === 'standard' || state.type === 'customEvenRows') {
 		return true;
 	}
 
-	const rowsPerCar = typeof state.rowsPerCar === 'number'
-		? state.spacings
-			.map((_, i) => i)
-			.filter((i) => ((i + 1) % (state.rowsPerCar as number)) === 0)
-		: state.rowsPerCar;
+	const { rowsPerCar } = state;
 
 	if (rowsPerCar.length !== 0) {
 		const carLength = rowsPerCar[0] + 1;
@@ -56,6 +52,18 @@ export function allCarsSame(state: TrainEditorState, rows: number) {
 		}
 	} else {
 		printError(state);
+	}
+
+	return true;
+}
+
+export function allCarsSame(state: TrainEditorState, rows: number) {
+	if (state.type === 'standard') {
+		return true;
+	}
+
+	if (!allCarsSameLength(state)) {
+		return false;
 	}
 
 	// All cars same length
@@ -69,9 +77,8 @@ export function allCarsSame(state: TrainEditorState, rows: number) {
 	}
 
 	// All cars same length and type
-
 	if (state.spacings.length === rows) {
-		const carLength = rowsPerCar[0] + 1;
+		const carLength = typeof state.rowsPerCar === 'number' ? state.rowsPerCar : state.rowsPerCar[0] + 1;
 		const numCars = rows / carLength;
 		if (Math.floor(numCars) !== numCars || carLength > state.spacings.length) {
 			printError(state);
@@ -80,8 +87,8 @@ export function allCarsSame(state: TrainEditorState, rows: number) {
 		for (let carI = 0; carI < carLength; carI++) {
 			// carI = row within a car
 			const baseline = state.spacings[carI];
-			for (let j = carI + carLength; j < numCars; j++) {
-				if (state.spacings[j].some((x, i) => x !== baseline[i])) {
+			for (let j = 0; j < numCars; j++) {
+				if (state.spacings[j * carLength + carI].some((x, i) => x !== baseline[i])) {
 					return false;
 				}
 			}

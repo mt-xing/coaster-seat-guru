@@ -1,7 +1,9 @@
 import {
 	ChangeEvent, Fragment, useCallback, useMemo, useState
 } from 'react';
-import { allCarsSame as allCarsSameFn, convertSameToCustomFull, TrainEditorState } from 'model/trainEditorState';
+import {
+	allCarsSame as allCarsSameFn, allCarsSameLength, convertSameToCustomFull, TrainEditorState
+} from 'model/trainEditorState';
 import { assertUnreachable } from 'utils/assert';
 import styles from '../styles/Train.module.css';
 
@@ -23,9 +25,9 @@ export default function TrainEditor(props: TrainProps) {
 
 	const setRows = useCallback((evt: ChangeEvent<HTMLSelectElement>) => {
 		if (evt.target.value !== 'Custom') {
-			if (!allCarsSame) {
+			if (!allCarsSameLength(state)) {
 				// eslint-disable-next-line no-restricted-globals, no-alert
-				if (!confirm('This will overwrite any modifications you\'ve made to specific cars and reset all cars to match the first one. Are you sure you want to continue?')) {
+				if (!confirm('This will overwrite any custom car-lengths and reset all cars to match the first one. Are you sure you want to continue?')) {
 					return;
 				}
 			}
@@ -75,11 +77,11 @@ export default function TrainEditor(props: TrainProps) {
 			: { ...state, type: 'custom', rowsPerCar: rows.filter((i) => (i + 1) % rowsPerCar === 0) };
 
 		setState(newState);
-	}, [state, props.rows, rows, cols, allCarsSame]);
+	}, [state, props.rows, rows, cols]);
 
 	const rowEditHelper = useCallback((rowsPerCar: number[]) => {
 		if (state.type !== 'custom') {
-			if (!allCarsSame) {
+			if (allCarsSame) {
 				// eslint-disable-next-line no-restricted-globals, no-alert
 				if (!confirm('This will result in different cars having different numbers of rows. Are you sure you wish to continue?')) {
 					return;
