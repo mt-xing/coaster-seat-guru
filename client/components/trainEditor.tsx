@@ -1,6 +1,8 @@
 import {
 	ChangeEvent, Fragment, useCallback, useMemo, useState
 } from 'react';
+import { allCarsSame as allCarsSameFn, convertSameToCustomFull, TrainEditorState } from 'model/trainEditorState';
+import { assertUnreachable } from 'utils/assert';
 import styles from '../styles/Train.module.css';
 
 export type TrainProps = {
@@ -9,82 +11,120 @@ export type TrainProps = {
 };
 
 export default function TrainEditor(props: TrainProps) {
-	// If array, each entry is zero-index number of row after which to cut the car,
-	// INCLUDING last car; length === number of cars
-	const [rowsPerCar, setRowsPerCar] = useState<number | number[]>(1);
-
 	const rows = useMemo(() => Array.from(Array(props.rows).keys()), [props.rows]);
 	const cols = useMemo(() => Array.from(Array(props.cols).keys()), [props.cols]);
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const dummySpacings = useMemo(() => rows.map((_) => cols.map((_2) => true)), [rows, cols]);
 
-	const [spacings, setSpacings] = useState<boolean[][]>(dummySpacings);
+	const dummyState = useMemo(() => ({
+		type: 'standard' as const, rowsPerCar: 1, carDesign: 'normal' as const, spacings: [cols.map((_) => true)]
+	}), [cols]);
+	const [state, setState] = useState<TrainEditorState>(dummyState);
 
-	const allCarsSame = useMemo(() => {
-		if (typeof rowsPerCar === 'number') {
-			return true;
-		}
-		if (rowsPerCar.length === 0) { return true; }
-		const carLength = rowsPerCar[0] + 1;
-		return rowsPerCar.every((x, i, a) => i === 0 || (x - a[i - 1]) === carLength);
-	}, [rowsPerCar]);
+	const allCarsSame = useMemo(() => allCarsSameFn(state, props.rows), [state, props.rows]);
 
 	const setRows = useCallback((evt: ChangeEvent<HTMLSelectElement>) => {
 		if (evt.target.value !== 'Custom') {
-			if (typeof rowsPerCar !== 'number' && !allCarsSame) {
+			if (!allCarsSame) {
 				// eslint-disable-next-line no-restricted-globals, no-alert
 				if (!confirm('This will overwrite any modifications you\'ve made to specific cars and reset all cars to match the first one. Are you sure you want to continue?')) {
 					return;
 				}
 			}
-			setRowsPerCar(Number(evt.target.value));
+
+			switch (state.type) {
+			case 'standard': {
+				const rowsPerCar = Number(evt.target.value);
+				setState({
+					...state,
+					rowsPerCar,
+					spacings: rowsPerCar <= state.rowsPerCar
+						? state.spacings.slice(0, rowsPerCar)
+						: state.spacings.concat(
+							Array.from(Array(rowsPerCar - state.rowsPerCar).keys())
+								.map((__) => cols.map((_) => true))
+						),
+				});
+				break;
+			}
+			case 'customEvenRows':
+				setState({
+					...state,
+					rowsPerCar: Number(evt.target.value)
+				});
+				break;
+			case 'custom':
+				setState({
+					...state,
+					type: 'customEvenRows',
+					rowsPerCar: Number(evt.target.value),
+				});
+				break;
+			default:
+				assertUnreachable(state);
+			}
 			return;
 		}
-		if (typeof rowsPerCar !== 'number') {
+
+		// Set to custom number of rows
+
+		if (state.type === 'custom') {
 			return;
 		}
-		setRowsPerCar(rows.filter((i) => (i + 1) % rowsPerCar === 0));
-	}, [rowsPerCar, rows, allCarsSame]);
+		const { rowsPerCar } = state;
+		const newState: TrainEditorState = state.type === 'standard'
+			? convertSameToCustomFull(state, props.rows)
+			: { ...state, type: 'custom', rowsPerCar: rows.filter((i) => (i + 1) % rowsPerCar === 0) };
+
+		setState(newState);
+	}, [state, props.rows, rows, allCarsSame]);
+
+	const rowEditHelper = useCallback((rowsPerCar: number[]) => {
+		if (state.type !== 'custom') {
+			if (!allCarsSame) {
+				// eslint-disable-next-line no-restricted-globals, no-alert
+				if (!confirm('This will result in different cars having different numbers of rows. Are you sure you wish to continue?')) {
+					return;
+				}
+			}
+			const newState: TrainEditorState = state.type === 'standard'
+				? { ...convertSameToCustomFull(state, props.rows), rowsPerCar }
+				: { ...state, type: 'custom', rowsPerCar };
+			setState(newState);
+		} else {
+			setState({ ...state, rowsPerCar });
+		}
+	}, [state, props.rows, allCarsSame]);
 
 	const mergeRow = useCallback((row: number) => {
-		if (typeof rowsPerCar === 'number') {
-			// eslint-disable-next-line no-restricted-globals, no-alert
-			if (!confirm('This will result in different cars having different numbers of rows. Are you sure you wish to continue?')) {
-				// TODO: check for per-car modifications
-				return;
-			}
-			setRowsPerCar(rows.filter((i) => (i + 1) % rowsPerCar === 0 && i !== row));
-		} else {
-			setRowsPerCar(rowsPerCar.filter((x) => x !== row));
-		}
-	}, [rowsPerCar, rows]);
+		rowEditHelper(
+			state.type !== 'custom'
+				? rows.filter((i) => (i + 1) % state.rowsPerCar === 0 && i !== row)
+				: state.rowsPerCar.filter((x) => x !== row)
+		);
+	}, [state, rows, rowEditHelper]);
 
 	const splitRow = useCallback((row: number) => {
-		if (typeof rowsPerCar === 'number') {
-			// eslint-disable-next-line no-restricted-globals, no-alert
-			if (!confirm('This will result in different cars having different numbers of rows. Are you sure you wish to continue?')) {
-				// TODO: check for per-car modifications
-				return;
-			}
-			setRowsPerCar(rows
-				.filter((i) => (i + 1) % rowsPerCar === 0)
-				.concat(row)
-				.sort((a, b) => a - b));
-		} else {
-			setRowsPerCar(rowsPerCar.concat(row).sort((a, b) => a - b));
-		}
-	}, [rowsPerCar, rows]);
+		rowEditHelper(
+			state.type !== 'custom'
+				? rows
+					.filter((i) => (i + 1) % state.rowsPerCar === 0)
+					.concat(row)
+					.sort((a, b) => a - b)
+				: state.rowsPerCar.concat(row).sort((a, b) => a - b)
+		);
+	}, [state, rows, rowEditHelper]);
 
 	const addSpace = useCallback((row: number, seat: number) => {
-		const r = spacings[row];
+		const r = state.spacings[row];
 		const newR = r.slice(0, seat + 1).concat(false).concat(r.slice(seat + 1, r.length));
-		const newSpacings = spacings.slice();
+		const newSpacings = state.spacings.slice();
 		newSpacings[row] = newR;
-		setSpacings(newSpacings);
-	}, [spacings]);
+		setState({ ...state, spacings: newSpacings });
+	}, [state]);
+
+	console.log(state);
 
 	return <section className={`${styles.coaster} ${styles.trainEdit}`}>
-		<p>Rows per car: <select onChange={setRows} value={typeof rowsPerCar === 'number' ? rowsPerCar : 'Custom'}>{
+		<p>Rows per car: <select onChange={setRows} value={state.type === 'custom' ? 'Custom' : state.rowsPerCar}>{
 			rows
 				.filter((x) => props.rows % (x + 1) === 0)
 				.map((r) => <option key={r} value={r + 1}>{r + 1}</option>)
@@ -94,38 +134,41 @@ export default function TrainEditor(props: TrainProps) {
 		<p>Front of train</p>
 		<table className={styles.coasterTrain}>
 			<tbody>
-				{spacings.map((colSpacings, r) => <Fragment key={r}>
-					<tr>
-						<td>{r + 1}</td>
-						<td><div>
-							{colSpacings.map((seat, c) => <Fragment key={c}>
-								{seat ? <><div
-									className='seat'
-									style={{
-										backgroundColor: 'rgb(128,128,128)', height: '30px', width: '30px', margin: '0 5px', display: 'inline-block', verticalAlign: 'middle'
-									}}
-								></div></> : <div style={{
-									height: '30px', width: '30px', margin: 0, display: 'inline-block', verticalAlign: 'middle'
-								}}>•</div>
-								}
-								{ c !== (colSpacings.length - 1)
-									? <div className={styles.spaceAdd} style={{ display: 'inline-block', verticalAlign: 'middle' }}>
-										<button onClick={() => addSpace(r, c)}>+</button>
-									</div>
-									: null }
-							</Fragment>)}
-						</div></td>
-					</tr>
-					{r !== (props.rows - 1)
-						? <RowEdit
-							rowsPerCar={rowsPerCar}
-							r={r}
-							cols={props.cols}
-							mergeRow={mergeRow}
-							splitRow={splitRow}
-						/> : null
-					}
-				</Fragment>)}
+				{rows.map((r) => {
+					const colSpacings = state.type === 'standard' ? state.spacings[r % state.rowsPerCar] : state.spacings[r];
+					return <Fragment key={r}>
+						<tr>
+							<td>{r + 1}</td>
+							<td><div>
+								{colSpacings.map((seat, c) => <Fragment key={c}>
+									{seat ? <><div
+										className='seat'
+										style={{
+											backgroundColor: 'rgb(128,128,128)', height: '30px', width: '30px', margin: '0 5px', display: 'inline-block', verticalAlign: 'middle'
+										}}
+									></div></> : <div style={{
+										height: '30px', width: '30px', margin: 0, display: 'inline-block', verticalAlign: 'middle'
+									}}>•</div>
+									}
+									{ c !== (colSpacings.length - 1) && (state.type !== 'standard' || r < state.rowsPerCar)
+										? <div className={styles.spaceAdd} style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+											<button onClick={() => addSpace(r, c)}>+</button>
+										</div>
+										: null }
+								</Fragment>)}
+							</div></td>
+						</tr>
+						{r !== (props.rows - 1)
+							? <RowEdit
+								rowsPerCar={state.rowsPerCar}
+								r={r}
+								cols={props.cols}
+								mergeRow={mergeRow}
+								splitRow={splitRow}
+							/> : null
+						}
+					</Fragment>;
+				})}
 			</tbody>
 		</table>
 	</section>;

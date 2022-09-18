@@ -1,0 +1,127 @@
+export type CarShape = 'normal' | 'circular';
+
+export type StandardTrainState = {
+	type: 'standard',
+	rowsPerCar: number,
+	carDesign: CarShape,
+	spacings: boolean[][],
+};
+
+export type CustomTrainState = CustomTrainStateEvenRows | CustomTrainStateAdvRows;
+
+export type CustomTrainStateEvenRows = {
+	type: 'customEvenRows',
+	rowsPerCar: number,
+	carDesign: CarShape[],
+	spacings: boolean[][],
+}
+
+export 	type CustomTrainStateAdvRows = {
+	type: 'custom',
+	// Each entry is zero-index number of row after which to cut the car,
+	// INCLUDING last car; length === number of cars
+	rowsPerCar: number[],
+	carDesign: CarShape[],
+	spacings: boolean[][],
+}
+
+export type TrainEditorState = StandardTrainState | CustomTrainState;
+
+const printError = (state: unknown) => {
+	// eslint-disable-next-line no-console
+	console.error('Invalid state');
+	// eslint-disable-next-line no-console
+	console.error(state);
+
+	if (process.env.NODE_ENV === 'development') {
+		throw new Error('Invalid state');
+	}
+};
+
+export function allCarsSame(state: TrainEditorState, rows: number) {
+	if (state.type === 'standard') {
+		return true;
+	}
+
+	const rowsPerCar = typeof state.rowsPerCar === 'number'
+		? state.spacings
+			.map((_, i) => i)
+			.filter((i) => ((i + 1) % (state.rowsPerCar as number)) === 0)
+		: state.rowsPerCar;
+
+	if (rowsPerCar.length !== 0) {
+		const carLength = rowsPerCar[0] + 1;
+		if (rowsPerCar.some((x, i, a) => i !== 0 && (x - a[i - 1]) !== carLength)) {
+			return false;
+		}
+	} else {
+		printError(state);
+	}
+
+	// All cars same length
+
+	if (state.carDesign.length !== 0) {
+		if (state.carDesign.some((x) => x !== state.carDesign[0])) {
+			return false;
+		}
+	} else {
+		printError(state);
+	}
+
+	// All cars same length and type
+
+	if (state.spacings.length === rows) {
+		const carLength = rowsPerCar[0] + 1;
+		const numCars = rows / carLength;
+		if (Math.floor(numCars) !== numCars || carLength > state.spacings.length) {
+			printError(state);
+			return false;
+		}
+		for (let carI = 0; carI < carLength; carI++) {
+			// carI = row within a car
+			const baseline = state.spacings[carI];
+			for (let j = carI + carLength; j < numCars; j++) {
+				if (state.spacings[j].some((x, i) => x !== baseline[i])) {
+					return false;
+				}
+			}
+		}
+	} else {
+		printError(state);
+	}
+
+	return true;
+}
+
+export function convertSameToCustomKeepCar(state: StandardTrainState, rows: number):
+CustomTrainStateEvenRows {
+	const numCars = rows / state.rowsPerCar;
+	if (Math.floor(numCars) !== numCars) {
+		printError(state);
+	}
+
+	const newSpacings: boolean[][] = [];
+	for (let i = 0; i < numCars; i++) {
+		state.spacings.forEach((row) => newSpacings.push(row.slice()));
+	}
+	if (newSpacings.length !== rows) {
+		printError(state);
+	}
+
+	return {
+		type: 'customEvenRows',
+		rowsPerCar: state.rowsPerCar,
+		carDesign: newSpacings.map((_) => state.carDesign),
+		spacings: newSpacings,
+	};
+}
+
+export function convertSameToCustomFull(state: StandardTrainState, rows: number):
+CustomTrainStateAdvRows {
+	const temp = convertSameToCustomKeepCar(state, rows);
+	return {
+		...temp,
+		type: 'custom',
+		rowsPerCar: Array.from(Array(rows).keys()).filter((i) => (i + 1) % temp.rowsPerCar === 0),
+	};
+}
