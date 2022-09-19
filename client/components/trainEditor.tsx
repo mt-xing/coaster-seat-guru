@@ -292,12 +292,18 @@ function TrainCar(props: {
 				: null
 		}{
 			props.startingRow === 0
-				? <p><label><input
+				? <><p style={{ marginTop: '5px' }}><label style={{ display: 'flex', flexDirection: 'row' }}><input
 					type='checkbox'
 					checked={state.type === 'standard'}
 					onChange={changeToCustom}
 					disabled={state.type === 'custom'}
-				/> {state.type === 'custom' ? <del>Same design for all cars</del> : 'Same design for all cars'}</label></p>
+					style={{ marginRight: '4px' }}
+				/> {state.type === 'custom'
+					? <div><del>Same design for all cars</del><br />
+						<small>Not available with custom cars</small></div>
+					: <div>Same design for all cars<br />
+						<small>Applies to seats and car shape</small></div>}</label></p>
+				</>
 				: null
 		}
 		</td>
