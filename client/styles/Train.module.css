@@ -250,6 +250,7 @@
 
 .coasterTrain .carOptions {
     font-size: 14px;
+    text-align: left;
 }
 
 .coasterTrain .carOptions p {

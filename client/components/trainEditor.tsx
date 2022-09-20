@@ -6,6 +6,7 @@ import {
 	allCarsSameLength, convertSameToCustomFull, convertSameToCustomKeepCar, TrainEditorState
 } from 'model/trainEditorState';
 import { assertUnreachable } from 'utils/assert';
+import SwitchSelector from 'react-switch-selector';
 import styles from '../styles/Train.module.css';
 
 export type TrainProps = {
@@ -288,7 +289,24 @@ function TrainCar(props: {
 		</table></td>
 		<td className={styles.carOptions}>{
 			(props.startingRow === 0 || state.type !== 'standard')
-				? <p><label><input type='checkbox' /> Spinning Car</label></p>
+				? <p style={{ display: 'inline-block', width: '100px' }}><SwitchSelector
+					onChange={() => {}}
+					options={[{
+						label: <div style={{
+							width: '15px', height: '15px', margin: '5px 0', background: 'black', fontSize: 0, transform: 'translateX(-2px)'
+						}}>Regular Car</div>,
+						value: 'normal' as const,
+					}, {
+						label: <div style={{
+							width: '15px', height: '15px', margin: '5px', background: 'black', fontSize: 0, borderRadius: '15px', transform: 'translateX(-2px)'
+						}}>Spinning Car</div>,
+						value: 'circular' as const,
+					}]}
+					initialSelectedIndex={0}
+					backgroundColor={'rgba(230,230,230)'}
+					selectedBackgroundColor={'rgba(128,128,128)'}
+					fontColor={'black'}
+				/></p>
 				: null
 		}{
 			props.startingRow === 0
