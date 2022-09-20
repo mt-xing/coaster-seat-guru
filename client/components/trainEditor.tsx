@@ -3,7 +3,7 @@ import {
 } from 'react';
 import {
 	allCarsSame as allCarsSameFn,
-	allCarsSameLength, convertSameToCustomFull, convertSameToCustomKeepCar, TrainEditorState
+	allCarsSameLength, CarShape, convertSameToCustomFull, convertSameToCustomKeepCar, TrainEditorState
 } from 'model/trainEditorState';
 import { assertUnreachable } from 'utils/assert';
 import SwitchSelector from 'react-switch-selector';
@@ -146,6 +146,16 @@ export default function TrainEditor(props: TrainProps) {
 		spaceEdit(row, newR);
 	}, [state, spaceEdit]);
 
+	const setCarType = useCallback((value: CarShape, car: number) => {
+		if (state.type === 'standard') {
+			setState({ ...state, carDesign: value });
+		} else {
+			const carDesign = state.carDesign.slice();
+			carDesign[car] = value;
+			setState({ ...state, carDesign });
+		}
+	}, [state]);
+
 	const changeToCustom = useCallback((evt: ChangeEvent<HTMLInputElement>) => {
 		const { checked } = evt.currentTarget;
 		// eslint-disable-next-line no-console
@@ -193,6 +203,7 @@ export default function TrainEditor(props: TrainProps) {
 						Array.from(Array(props.rows / state.rowsPerCar).keys())
 							.map((i) => <TrainCar
 								key={i}
+								carNum={i}
 								numRows={state.rowsPerCar}
 								cols={props.cols}
 								startingRow={i * state.rowsPerCar}
@@ -202,11 +213,13 @@ export default function TrainEditor(props: TrainProps) {
 								splitRow={splitRow}
 								addSpace={addSpace}
 								removeSpace={removeSpace}
+								setCarType={setCarType}
 								changeToCustom={changeToCustom}
 							/>)
 					) : (
 						state.rowsPerCar.map((carSplitLoc, carI) => <TrainCar
 							key={carI}
+							carNum={carI}
 							numRows={carI === 0 ? carSplitLoc + 1 : carSplitLoc - state.rowsPerCar[carI - 1]}
 							cols={props.cols}
 							startingRow={carI === 0 ? 0 : state.rowsPerCar[carI - 1] + 1}
@@ -216,6 +229,7 @@ export default function TrainEditor(props: TrainProps) {
 							splitRow={splitRow}
 							addSpace={addSpace}
 							removeSpace={removeSpace}
+							setCarType={setCarType}
 							changeToCustom={changeToCustom}
 						/>)
 					)
@@ -230,18 +244,25 @@ function TrainCar(props: {
 	cols: number,
 	startingRow: number,
 	state: TrainEditorState,
+	carNum: number,
 	lastCar: boolean,
 
 	mergeRow: (x: number) => void,
 	splitRow: (x: number) => void,
 	addSpace: (a: number, b: number) => void,
 	removeSpace: (a: number, b: number) => void,
+	setCarType: (value: CarShape, car: number) => void,
 	changeToCustom: (evt: ChangeEvent<HTMLInputElement>) => void,
 }) {
 	const rows = useMemo(() => Array.from(Array(props.numRows).keys()), [props.numRows]);
 	const {
-		state, lastCar, mergeRow, splitRow, addSpace, removeSpace, changeToCustom
+		state, lastCar, carNum, mergeRow, splitRow, addSpace, removeSpace, setCarType, changeToCustom
 	} = props;
+	const changeCarType = useCallback(
+		(v: unknown) => setCarType(v as CarShape, carNum),
+		[setCarType, carNum]
+	);
+	const carType = state.type === 'standard' ? state.carDesign : state.carDesign[carNum];
 	return <><tr>
 		<td><table className={`${styles.coasterTrain} ${styles.coasterCar}`}>
 			<tbody>
@@ -288,9 +309,9 @@ function TrainCar(props: {
 			</tbody>
 		</table></td>
 		<td className={styles.carOptions}>{
-			(props.startingRow === 0 || state.type !== 'standard')
-				? <p style={{ display: 'inline-block', width: '100px' }}><SwitchSelector
-					onChange={() => {}}
+			(carNum === 0 || state.type !== 'standard')
+				? <div style={{ display: 'inline-block', width: '100px' }}><SwitchSelector
+					onChange={changeCarType}
 					options={[{
 						label: <div style={{
 							width: '15px', height: '15px', margin: '5px 0', background: 'black', fontSize: 0, transform: 'translateX(-2px)'
@@ -302,15 +323,16 @@ function TrainCar(props: {
 						}}>Spinning Car</div>,
 						value: 'circular' as const,
 					}]}
-					initialSelectedIndex={0}
+					name={`selectorCar${carNum}`}
+					forcedSelectedIndex={carType === 'normal' ? 0 : 1}
 					backgroundColor={'rgba(230,230,230)'}
 					selectedBackgroundColor={'rgba(128,128,128)'}
 					fontColor={'black'}
-				/></p>
+				/></div>
 				: null
 		}{
 			props.startingRow === 0
-				? <><p style={{ marginTop: '5px' }}><label style={{ display: 'flex', flexDirection: 'row' }}><input
+				? <><div style={{ marginTop: '5px' }}><label style={{ display: 'flex', flexDirection: 'row' }}><input
 					type='checkbox'
 					checked={state.type === 'standard'}
 					onChange={changeToCustom}
@@ -320,7 +342,7 @@ function TrainCar(props: {
 					? <div><del>Same design for all cars</del><br />
 						<small>Not available with custom cars</small></div>
 					: <div>Same design for all cars<br />
-						<small>Applies to seats and car shape</small></div>}</label></p>
+						<small>Applies to seats and car shape</small></div>}</label></div>
 				</>
 				: null
 		}
