@@ -7,6 +7,7 @@ import {
 } from 'model/trainEditorState';
 import { assertUnreachable } from 'utils/assert';
 import SwitchSelector from 'react-switch-selector';
+import ReactTooltip from 'react-tooltip';
 import styles from '../styles/Train.module.css';
 
 export type TrainProps = {
@@ -33,6 +34,10 @@ export default function TrainEditor(props: TrainProps) {
 	}, [dummyState, props.cols, numCols]);
 
 	const allCarsSame = useMemo(() => allCarsSameFn(state, props.rows), [state, props.rows]);
+
+	useEffect(() => {
+		ReactTooltip.rebuild();
+	}, [allCarsSame]);
 
 	const setRows = useCallback((evt: ChangeEvent<HTMLSelectElement>) => {
 		if (evt.target.value !== 'Custom') {
@@ -189,6 +194,7 @@ export default function TrainEditor(props: TrainProps) {
 	}, [state, props.rows, allCarsSame]);
 
 	return <section className={`${styles.coaster} ${styles.trainEdit}`}>
+		<ReactTooltip effect='solid' backgroundColor='rgb(64,64,64)' />
 		<p>Rows per car: <select onChange={setRows} value={state.type === 'custom' ? 'Custom' : state.rowsPerCar}>{
 			rows
 				.filter((x) => props.rows % (x + 1) === 0)
@@ -313,12 +319,12 @@ function TrainCar(props: {
 				? <div style={{ display: 'inline-block', width: '100px' }}><SwitchSelector
 					onChange={changeCarType}
 					options={[{
-						label: <div style={{
+						label: <div data-tip="Standard Car" style={{
 							width: '15px', height: '15px', margin: '5px 0', background: 'black', fontSize: 0, transform: 'translateX(-2px)'
 						}}>Regular Car</div>,
 						value: 'normal' as const,
 					}, {
-						label: <div style={{
+						label: <div data-tip="Spinning Car" style={{
 							width: '15px', height: '15px', margin: '5px', background: 'black', fontSize: 0, borderRadius: '15px', transform: 'translateX(-2px)'
 						}}>Spinning Car</div>,
 						value: 'circular' as const,
