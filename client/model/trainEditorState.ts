@@ -100,8 +100,8 @@ export function allCarsSame(state: TrainEditorState, rows: number) {
 	return true;
 }
 
-export function convertSameToCustomKeepCar(state: StandardTrainState, rows: number):
-CustomTrainStateEvenRows {
+export function convertSameToCustomFull(state: StandardTrainState, rows: number):
+CustomTrainStateAdvRows {
 	const numCars = rows / state.rowsPerCar;
 	if (Math.floor(numCars) !== numCars) {
 		printError(state);
@@ -115,20 +115,22 @@ CustomTrainStateEvenRows {
 		printError(state);
 	}
 
+	const rowsPerCar = Array.from(Array(rows).keys()).filter((i) => (i + 1) % state.rowsPerCar === 0);
+
 	return {
-		type: 'customEvenRows',
-		rowsPerCar: state.rowsPerCar,
-		carDesign: newSpacings.map((_) => state.carDesign),
+		type: 'custom',
+		rowsPerCar,
+		carDesign: rowsPerCar.map((_) => state.carDesign),
 		spacings: newSpacings,
 	};
 }
 
-export function convertSameToCustomFull(state: StandardTrainState, rows: number):
-CustomTrainStateAdvRows {
-	const temp = convertSameToCustomKeepCar(state, rows);
+export function convertSameToCustomKeepCar(state: StandardTrainState, rows: number):
+CustomTrainStateEvenRows {
+	const temp = convertSameToCustomFull(state, rows);
 	return {
 		...temp,
-		type: 'custom',
-		rowsPerCar: Array.from(Array(rows).keys()).filter((i) => (i + 1) % temp.rowsPerCar === 0),
+		type: 'customEvenRows',
+		rowsPerCar: temp.rowsPerCar.length > 0 ? temp.rowsPerCar[0] + 1 : 0,
 	};
 }

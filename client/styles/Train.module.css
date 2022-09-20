@@ -261,3 +261,18 @@
     height: 18px;
     width: 18px;
 }
+
+.roundCar {
+    background: none;
+    position: relative;
+    padding-bottom: 5px;
+}
+
+.roundCar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 42px;
+    width: calc(100% - 42px); height: 100%;
+    background: rgb(230, 230, 230);
+    border-radius: 50%;
+}

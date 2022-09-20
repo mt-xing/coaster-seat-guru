@@ -8,6 +8,7 @@ import {
 import { assertUnreachable } from 'utils/assert';
 import SwitchSelector from 'react-switch-selector';
 import ReactTooltip from 'react-tooltip';
+import NoSsr from 'utils/noSsr';
 import styles from '../styles/Train.module.css';
 
 export type TrainProps = {
@@ -194,7 +195,9 @@ export default function TrainEditor(props: TrainProps) {
 	}, [state, props.rows, allCarsSame]);
 
 	return <section className={`${styles.coaster} ${styles.trainEdit}`}>
-		<ReactTooltip effect='solid' backgroundColor='rgb(64,64,64)' />
+		<NoSsr>
+			<ReactTooltip effect='solid' backgroundColor='rgb(64,64,64)' />
+		</NoSsr>
 		<p>Rows per car: <select onChange={setRows} value={state.type === 'custom' ? 'Custom' : state.rowsPerCar}>{
 			rows
 				.filter((x) => props.rows % (x + 1) === 0)
@@ -270,7 +273,7 @@ function TrainCar(props: {
 	);
 	const carType = state.type === 'standard' ? state.carDesign : state.carDesign[carNum];
 	return <><tr>
-		<td><table className={`${styles.coasterTrain} ${styles.coasterCar}`}>
+		<td><table className={`${styles.coasterTrain} ${styles.coasterCar}${carType === 'circular' ? ` ${styles.roundCar}` : ''}`}>
 			<tbody>
 				{rows.map((rRaw) => {
 					const r = rRaw + props.startingRow;
