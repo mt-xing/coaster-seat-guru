@@ -321,7 +321,7 @@ function TrainCar(props: {
 					options={[{
 						label: <div data-tip="Standard Car" style={{
 							width: '15px', height: '15px', margin: '5px 0', background: 'black', fontSize: 0, transform: 'translateX(-2px)'
-						}}>Regular Car</div>,
+						}}>Standard Car</div>,
 						value: 'normal' as const,
 					}, {
 						label: <div data-tip="Spinning Car" style={{
