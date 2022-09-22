@@ -3,7 +3,8 @@ import {
 } from 'react';
 import {
 	allCarsSame as allCarsSameFn,
-	allCarsSameLength, CarShape, convertSameToCustomFull, convertSameToCustomKeepCar, TrainEditorState
+	allCarsSameLength, CarShape, convertSameToCustomFull,
+	convertSameToCustomKeepCar, CustomTrainState, TrainEditorState
 } from 'model/trainEditorState';
 import { assertUnreachable } from 'utils/assert';
 import SwitchSelector from 'react-switch-selector';
@@ -64,19 +65,39 @@ export default function TrainEditor(props: TrainProps) {
 				});
 				break;
 			}
-			case 'customEvenRows':
+			case 'customEvenRows': {
+				const rowsPerCar = Number(evt.target.value);
+				const numCars = props.rows / rowsPerCar;
+				const oldNumCars = props.rows / state.rowsPerCar;
 				setState({
 					...state,
-					rowsPerCar: Number(evt.target.value)
+					rowsPerCar,
+					carDesign: numCars <= oldNumCars
+						? state.carDesign.slice(0, numCars)
+						: state.carDesign.concat(
+							Array.from(Array(numCars - oldNumCars).keys())
+								.map((__) => state.carDesign[0])
+						),
 				});
 				break;
-			case 'custom':
+			}
+			case 'custom': {
+				const rowsPerCar = Number(evt.target.value);
+				const numCars = props.rows / rowsPerCar;
+				const oldNumCars = state.rowsPerCar.length;
 				setState({
 					...state,
 					type: 'customEvenRows',
-					rowsPerCar: Number(evt.target.value),
+					rowsPerCar,
+					carDesign: numCars <= oldNumCars
+						? state.carDesign.slice(0, numCars)
+						: state.carDesign.concat(
+							Array.from(Array(numCars - oldNumCars).keys())
+								.map((__) => state.carDesign[0])
+						),
 				});
 				break;
+			}
 			default:
 				assertUnreachable(state);
 			}
@@ -97,6 +118,17 @@ export default function TrainEditor(props: TrainProps) {
 	}, [state, props.rows, rows, cols]);
 
 	const rowEditHelper = useCallback((rowsPerCar: number[]) => {
+		const setCarTypes = (input: CustomTrainState): CarShape[] => {
+			const inputDesigns = input.carDesign;
+			if (inputDesigns.length >= rowsPerCar.length) {
+				return inputDesigns.slice(0, rowsPerCar.length);
+			}
+			return inputDesigns.concat(
+				Array.from(Array(rowsPerCar.length - inputDesigns.length).keys())
+					.map((_) => inputDesigns[0])
+			);
+		};
+
 		if (state.type !== 'custom') {
 			if (allCarsSame) {
 				// eslint-disable-next-line no-restricted-globals, no-alert
@@ -106,10 +138,12 @@ export default function TrainEditor(props: TrainProps) {
 			}
 			const newState: TrainEditorState = state.type === 'standard'
 				? { ...convertSameToCustomFull(state, props.rows), rowsPerCar }
-				: { ...state, type: 'custom', rowsPerCar };
+				: {
+					...state, type: 'custom', rowsPerCar, carDesign: setCarTypes(state)
+				};
 			setState(newState);
 		} else {
-			setState({ ...state, rowsPerCar });
+			setState({ ...state, rowsPerCar, carDesign: setCarTypes(state) });
 		}
 	}, [state, props.rows, allCarsSame]);
 
