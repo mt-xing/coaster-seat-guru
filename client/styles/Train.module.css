@@ -251,6 +251,15 @@
 .coasterTrain .carOptions {
     font-size: 14px;
     text-align: left;
+    position: relative;
+    min-width: 200px;
+}
+
+.coasterTrain .carOptions .wrap {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .coasterTrain .carOptions p {

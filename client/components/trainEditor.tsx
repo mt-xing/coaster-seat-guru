@@ -351,7 +351,7 @@ function TrainCar(props: {
 				})}
 			</tbody>
 		</table></td>
-		<td className={styles.carOptions}>{
+		<td className={styles.carOptions}><div className={styles.wrap}>{
 			(carNum === 0 || state.type !== 'standard')
 				? <div style={{ display: 'inline-block', width: '100px' }}><SwitchSelector
 					onChange={changeCarType}
@@ -389,7 +389,7 @@ function TrainCar(props: {
 				</>
 				: null
 		}
-		</td>
+		</div></td>
 	</tr>
 	{!lastCar
 		? <RowEdit
