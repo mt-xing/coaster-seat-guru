@@ -381,7 +381,7 @@ function PageSidebar(props: {
 			If RCDB contradicts the park, defer to the park.
 		</p>
 		<p className={outerStyles.instruction}>
-			Rows per car: <select onChange={setRows} value={state.type === 'custom' ? 'Custom' : state.rowsPerCar}>{
+			Rows per car: <select className={outerStyles.rowSelector} onChange={setRows} value={state.type === 'custom' ? 'Custom' : state.rowsPerCar}>{
 				rows
 					.filter((x) => rows.length % (x + 1) === 0)
 					.map((r) => <option key={r} value={r + 1}>{r + 1}</option>)
@@ -401,7 +401,8 @@ function PageSidebar(props: {
 			If each row articulates independently, please set 1 row per car.
 		</p></> : null}
 		<p className={outerStyles.instruction}>
-			<button onClick={reset}>Need to start over?</button>
+			<button className={outerStyles.confirmBtn}>Confirm ✅</button>
+			<button className={outerStyles.confirmBtn} onClick={reset}>Start Over ❌</button>
 		</p>
 	</div>;
 }

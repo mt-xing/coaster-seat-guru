@@ -1,6 +1,9 @@
 .side {
 	display: inline-block;
 	vertical-align: top;
+
+	max-width: 100%;
+	overflow-x: auto;
 }
 
 .sidebar {
@@ -84,6 +87,7 @@
 .templateList .row {
 	display: block;
 	text-align: center;
+	white-space: nowrap;
 }
 
 .templateList .seat, .templateList .gap {
@@ -93,5 +97,60 @@
 }
 
 .templateList .seat {
+	background: rgb(128, 128, 128);
+}
+
+.numInputWrap {
+	display: inline-block;
+	margin-left: 30px;
+	margin-right: 30px;
+}
+
+.numInputWrap label {
+	display: flex;
+	flex-direction: row;
+}
+
+.numInputWrap label span.wrap {
+	display: inline-block;
+	text-align: right;
+}
+
+.numInputWrap label span.first {
+	font-size: 200%;
+}
+
+.numInputWrap label span.second {
+	display: block;
+}
+
+.numInputWrap label input {
+	display: inline-block;
+	font-size: 200%;
+	text-align: right;
+	width: 2em;
+	margin-left: 10px;
+}
+
+.rowSelector {
+	padding: 5px;
+	text-align: center;
+}
+
+.confirmBtn {
+	margin: 0 5px;
+	padding: 10px 20px;
+	background: white;
+	border: 1px black solid;
+	cursor: pointer;
+
+	transition: background 0.2s ease-in-out;
+}
+
+.confirmBtn:hover, .confirmBtn:active {
+	background: rgb(230, 230, 230);
+}
+
+.confirmBtn:active {
 	background: rgb(128, 128, 128);
 }
