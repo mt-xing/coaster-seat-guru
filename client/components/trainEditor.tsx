@@ -11,33 +11,32 @@ import SwitchSelector from 'react-switch-selector';
 import ReactTooltip from 'react-tooltip';
 import NoSsr from 'utils/noSsr';
 import Train from './train';
+import Splash from './trainEditorSplash';
 import styles from '../styles/Train.module.css';
 import outerStyles from '../styles/TrainEditor.module.css';
 
 export type TrainProps = {
-	rows: number,
-	cols: number,
+	initialRows?: number,
+	initialCols?: number,
 };
 
 export default function TrainEditor(props: TrainProps) {
-	const rows = useMemo(() => Array.from(Array(props.rows).keys()), [props.rows]);
-	const cols = useMemo(() => Array.from(Array(props.cols).keys()), [props.cols]);
+	const [state, setState] = useState<TrainEditorState | undefined>(undefined);
+	const [pRows, setPRows] = useState<number>(props.initialRows ?? 0);
+	const [pCols, setPCols] = useState<number>(props.initialCols ?? 0);
 
-	const dummyState = useCallback(() => ({
-		type: 'standard' as const, rowsPerCar: 1, carDesign: 'normal' as const, spacings: [cols.map((_) => true)]
-	}), [cols]);
-	const [state, setState] = useState<TrainEditorState>(dummyState);
-	const numCols = useMemo(() => (
-		state.spacings[0]?.reduce((a, x) => (x ? a + 1 : a), 0) ?? 0
-	), [state.spacings]);
+	const rows = useMemo(() => Array.from(Array(pRows).keys()), [pRows]);
+	const cols = useMemo(() => Array.from(Array(pCols).keys()), [pCols]);
 
-	useEffect(() => {
-		if (props.cols !== numCols) {
-			setState(dummyState());
-		}
-	}, [dummyState, props.cols, numCols]);
+	const allCarsSame = useMemo(
+		() => (state ? allCarsSameFn(state, pRows) : false),
+		[state, pRows]
+	);
 
-	const allCarsSame = useMemo(() => allCarsSameFn(state, props.rows), [state, props.rows]);
+	const numCars = useMemo(() => {
+		if (!state) { return 0; }
+		return state.type === 'custom' ? state.rowsPerCar.length : (pRows / state.rowsPerCar);
+	}, [state, pRows]);
 
 	useEffect(() => {
 		ReactTooltip.rebuild();
@@ -50,7 +49,20 @@ export default function TrainEditor(props: TrainProps) {
 	// ================
 	//
 
+	const setupCallback = useCallback((r: number, c: number, s: TrainEditorState) => {
+		setPRows(r);
+		setPCols(c);
+		setState(s);
+	}, []);
+
+	const reset = useCallback(() => {
+		// eslint-disable-next-line no-restricted-globals, no-alert
+		if (!confirm('Are you sure you want to discard this current train design?')) { return; }
+		setState(undefined);
+	}, []);
+
 	const setRows = useCallback((evt: ChangeEvent<HTMLSelectElement>) => {
+		if (state === undefined) { return; }
 		if (evt.target.value !== 'Custom') {
 			if (!allCarsSameLength(state)) {
 				// eslint-disable-next-line no-restricted-globals, no-alert
@@ -76,8 +88,7 @@ export default function TrainEditor(props: TrainProps) {
 			}
 			case 'customEvenRows': {
 				const rowsPerCar = Number(evt.target.value);
-				const numCars = props.rows / rowsPerCar;
-				const oldNumCars = props.rows / state.rowsPerCar;
+				const oldNumCars = pRows / state.rowsPerCar;
 				setState({
 					...state,
 					rowsPerCar,
@@ -92,7 +103,6 @@ export default function TrainEditor(props: TrainProps) {
 			}
 			case 'custom': {
 				const rowsPerCar = Number(evt.target.value);
-				const numCars = props.rows / rowsPerCar;
 				const oldNumCars = state.rowsPerCar.length;
 				setState({
 					...state,
@@ -120,13 +130,13 @@ export default function TrainEditor(props: TrainProps) {
 		}
 		const { rowsPerCar } = state;
 		const newState: TrainEditorState = state.type === 'standard'
-			? convertSameToCustomFull(state, props.rows)
+			? convertSameToCustomFull(state, pRows)
 			: { ...state, type: 'custom', rowsPerCar: rows.filter((i) => (i + 1) % rowsPerCar === 0) };
 
 		setState(newState);
-	}, [state, props.rows, rows, cols]);
+	}, [state, numCars, pRows, rows, cols]);
 
-	const rowEditHelper = useCallback((rowsPerCar: number[]) => {
+	const rowEditHelper = useCallback((rowsPerCar: number[], s: TrainEditorState) => {
 		const setCarTypes = (input: CustomTrainState): CarShape[] => {
 			const inputDesigns = input.carDesign;
 			if (inputDesigns.length >= rowsPerCar.length) {
@@ -138,56 +148,63 @@ export default function TrainEditor(props: TrainProps) {
 			);
 		};
 
-		if (state.type !== 'custom') {
+		if (s.type !== 'custom') {
 			if (allCarsSame) {
 				// eslint-disable-next-line no-restricted-globals, no-alert
 				if (!confirm('This will result in different cars having different numbers of rows. Are you sure you wish to continue?')) {
 					return;
 				}
 			}
-			const newState: TrainEditorState = state.type === 'standard'
-				? { ...convertSameToCustomFull(state, props.rows), rowsPerCar }
+			const newState: TrainEditorState = s.type === 'standard'
+				? { ...convertSameToCustomFull(s, pRows), rowsPerCar }
 				: {
-					...state, type: 'custom', rowsPerCar, carDesign: setCarTypes(state)
+					...s, type: 'custom', rowsPerCar, carDesign: setCarTypes(s)
 				};
 			setState(newState);
 		} else {
-			setState({ ...state, rowsPerCar, carDesign: setCarTypes(state) });
+			setState({ ...s, rowsPerCar, carDesign: setCarTypes(s) });
 		}
-	}, [state, props.rows, allCarsSame]);
+	}, [pRows, allCarsSame]);
 
 	const mergeRow = useCallback((row: number) => {
+		if (state === undefined) { return; }
 		rowEditHelper(
 			state.type !== 'custom'
 				? rows.filter((i) => (i + 1) % state.rowsPerCar === 0 && i !== row)
-				: state.rowsPerCar.filter((x) => x !== row)
+				: state.rowsPerCar.filter((x) => x !== row),
+			state
 		);
 	}, [state, rows, rowEditHelper]);
 
 	const splitRow = useCallback((row: number) => {
+		if (state === undefined) { return; }
 		rowEditHelper(
 			state.type !== 'custom'
 				? rows
 					.filter((i) => (i + 1) % state.rowsPerCar === 0)
 					.concat(row)
 					.sort((a, b) => a - b)
-				: state.rowsPerCar.concat(row).sort((a, b) => a - b)
+				: state.rowsPerCar.concat(row).sort((a, b) => a - b),
+			state
 		);
 	}, [state, rows, rowEditHelper]);
 
 	const spaceEdit = useCallback((row: number, newRow: boolean[]) => {
+		if (state === undefined) { return; }
 		const newSpacings = state.spacings.slice();
 		newSpacings[row] = newRow;
 		setState({ ...state, spacings: newSpacings });
 	}, [state]);
 
 	const addSpace = useCallback((row: number, seat: number) => {
+		if (state === undefined) { return; }
 		const r = state.spacings[row];
 		const newR = r.slice(0, seat + 1).concat(false).concat(r.slice(seat + 1));
 		spaceEdit(row, newR);
 	}, [state, spaceEdit]);
 
 	const removeSpace = useCallback((row: number, col: number) => {
+		if (state === undefined) { return; }
 		const r = state.spacings[row];
 		// eslint-disable-next-line no-console
 		if (r[col]) { console.error('Invalid space'); return; }
@@ -196,6 +213,7 @@ export default function TrainEditor(props: TrainProps) {
 	}, [state, spaceEdit]);
 
 	const setCarType = useCallback((value: CarShape, car: number) => {
+		if (state === undefined) { return; }
 		if (state.type === 'standard') {
 			setState({ ...state, carDesign: value });
 		} else {
@@ -206,6 +224,7 @@ export default function TrainEditor(props: TrainProps) {
 	}, [state]);
 
 	const changeToCustom = useCallback((evt: ChangeEvent<HTMLInputElement>) => {
+		if (state === undefined) { return; }
 		const { checked } = evt.currentTarget;
 		// eslint-disable-next-line no-console
 		if (state.type === 'custom') { console.error('How did custom train try to change checkbox?'); return; }
@@ -213,7 +232,7 @@ export default function TrainEditor(props: TrainProps) {
 		switch (state.type) {
 		case 'standard': {
 			if (checked) { return; }
-			setState(convertSameToCustomKeepCar(state, props.rows));
+			setState(convertSameToCustomKeepCar(state, pRows));
 			break;
 		}
 		case 'customEvenRows': {
@@ -235,7 +254,7 @@ export default function TrainEditor(props: TrainProps) {
 		default:
 			assertUnreachable(state);
 		}
-	}, [state, props.rows, allCarsSame]);
+	}, [state, pRows, allCarsSame]);
 
 	// #endregion
 
@@ -259,26 +278,26 @@ export default function TrainEditor(props: TrainProps) {
 	></div>, []);
 
 	const gap = useCallback(
-		(r: number, c: number) => <DeleteSpaceBtn
+		(r: number, c: number) => state && <DeleteSpaceBtn
 			r={r} c={c} state={state} removeSpace={removeSpace} />,
 		[state, removeSpace]
 	);
 
 	const sidebar = useCallback(
-		(carNum: number) => <SideBar
-			carNum={carNum} state={state}
+		(carNum: number) => state && <SideBar
+			carNum={carNum} numCars={numCars} state={state}
 			setCarType={setCarType} changeToCustom={changeToCustom}
 		/>,
-		[state, setCarType, changeToCustom]
+		[numCars, state, setCarType, changeToCustom]
 	);
 
-	const addGap = useCallback((r: number, c: number) => ((state.type !== 'standard' || r < state.rowsPerCar)
+	const addGap = useCallback((r: number, c: number) => (state && (state.type !== 'standard' || r < state.rowsPerCar)
 		? <div className={styles.spaceAdd} style={{ display: 'inline-block', verticalAlign: 'middle' }}>
 			<button onClick={() => addSpace(r, c)}>+</button>
 		</div>
 		: null), [state, addSpace]);
 
-	const rowEdit = useCallback((r: number) => <RowEdit
+	const rowEdit = useCallback((r: number) => state && <RowEdit
 		key={r}
 		rowsPerCar={state.rowsPerCar}
 		r={r}
@@ -295,14 +314,18 @@ export default function TrainEditor(props: TrainProps) {
 	// ========
 	//
 
+	if (state === undefined) {
+		return <Splash finishSetup={setupCallback} />;
+	}
+
 	return <>
 		<NoSsr>
 			<ReactTooltip effect='solid' backgroundColor='rgb(64,64,64)' />
 		</NoSsr>
 		<div className={outerStyles.side}>
 			<Train
-				rows={props.rows}
-				cols={props.cols}
+				rows={pRows}
+				cols={pCols}
 
 				rowsPerCar={state.rowsPerCar}
 				carDesign={state.carDesign}
@@ -316,7 +339,7 @@ export default function TrainEditor(props: TrainProps) {
 				renderRowGap={rowEdit}
 			/>
 		</div>
-		<PageSidebar state={state} rows={rows} setRows={setRows} />
+		<PageSidebar state={state} rows={rows} setRows={setRows} reset={reset} />
 	</>;
 	// #endregion
 }
@@ -324,24 +347,30 @@ export default function TrainEditor(props: TrainProps) {
 function PageSidebar(props: {
 	state: TrainEditorState,
 	rows: number[],
-	setRows: (evt: ChangeEvent<HTMLSelectElement>) => void
+	setRows: (evt: ChangeEvent<HTMLSelectElement>) => void,
+	reset: () => void,
 }) {
-	const { state, rows, setRows } = props;
+	const {
+		state, rows, setRows, reset
+	} = props;
 
 	const numCars = state.type !== 'custom' ? (rows.length / state.rowsPerCar) : state.rowsPerCar.length;
 	const maxRowsPerCar = useMemo(
 		() => (state.type !== 'custom'
 			? state.rowsPerCar
-			: state.rowsPerCar.reduce((a, x, i, arr) => Math.max(a, i === 0 ? x : x - arr[i - 1]), 0)),
+			: state.rowsPerCar.reduce((a, x, i, arr) => Math.max(
+				a,
+				i === 0 ? (x + 1) : x - arr[i - 1]
+			), 0)),
 		[state]
 	);
 
 	return <div className={`${outerStyles.side} ${outerStyles.sidebar}`}>
-		<section className={outerStyles.instruction}>
+		<p className={outerStyles.instruction}>
 			Edit the train to match the layout of the ride.
-		</section>
+		</p>
 		<p>
-			Use the circular shape for spinning cars
+			Use the circular shape for spinning cars.
 			Otherwise, keep the cars rectangular, regardless of shape.
 		</p>
 		<p>
@@ -350,9 +379,6 @@ function PageSidebar(props: {
 		</p>
 		<p>
 			If RCDB contradicts the park, defer to the park.
-			<br />
-			e.g. on B&amp;M hypers with staggered seating,
-			use two rows of two seats, not one row of four.
 		</p>
 		<p className={outerStyles.instruction}>
 			Rows per car: <select onChange={setRows} value={state.type === 'custom' ? 'Custom' : state.rowsPerCar}>{
@@ -363,7 +389,7 @@ function PageSidebar(props: {
 			}</select>
 		</p>
 		<p>{ maxRowsPerCar === 1 ? 'Each row in this train articulates independently.'
-			: `This train contains ${numCars} cars, each with ${
+			: `This train contains ${numCars === 1 ? '1 car' : `${numCars} cars`}, each with ${
 				state.type !== 'custom' ? state.rowsPerCar : 'a custom number of'
 			} rows.`
 		}</p>
@@ -374,6 +400,9 @@ function PageSidebar(props: {
 		</p><p>
 			If each row articulates independently, please set 1 row per car.
 		</p></> : null}
+		<p className={outerStyles.instruction}>
+			<button onClick={reset}>Need to start over?</button>
+		</p>
 	</div>;
 }
 
@@ -416,12 +445,13 @@ function DeleteSpaceBtn(props: {
 
 function SideBar(props: {
 	carNum: number,
+	numCars: number,
 	state: TrainEditorState,
 	setCarType: (s: CarShape, n: number) => void,
 	changeToCustom: (evt: ChangeEvent<HTMLInputElement>) => void,
 }) {
 	const {
-		carNum, state, setCarType, changeToCustom
+		carNum, numCars, state, setCarType, changeToCustom
 	} = props;
 	const setType = useCallback(
 		(v: unknown) => setCarType(v as CarShape, carNum),
@@ -450,7 +480,7 @@ function SideBar(props: {
 			/></div>
 			: null
 	}{
-		carNum === 0
+		carNum === 0 && numCars > 1
 			? <><div style={{ marginTop: '5px' }}><label style={{ display: 'flex', flexDirection: 'row' }}><input
 				type='checkbox'
 				checked={state.type === 'standard'}
