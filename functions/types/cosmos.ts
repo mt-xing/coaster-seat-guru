@@ -1,5 +1,7 @@
+export type CarShape = 'normal' | 'circular';
+
 export type CoasterDoc = {
-	id: number,
+	id: string,
 
 	name: string,
 	park: string,
@@ -7,6 +9,10 @@ export type CoasterDoc = {
 
 	rows: number,
 	cols: number,
+
+	rowsPerCar?: number | number[],
+	carDesign?: CarShape | CarShape[],
+	spacings?: boolean[][],
 
 	data: [number, number, number][][],
 	total: number,

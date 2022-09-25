@@ -6,6 +6,7 @@ import {
 import { SyncLoader } from 'react-spinners';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { GetCoasterResponse as QueryResult } from '@apiTypes/getCoaster';
 import Footer from '../components/footer';
 import Header from '../components/header';
 import { assertUnreachable } from '../utils/assert';
@@ -24,16 +25,6 @@ type ResultsState = {
 	selected: { row: number, col: number } | null,
 	heatmap: HeatMap,
 } & QueryResult);
-
-type QueryResult = {
-	id: string,
-	name: string,
-	park: string,
-	rows: number,
-	cols: number,
-	data: [number, number, number][][],
-	total: number,
-};
 
 function ResultsPage() {
 	const [state, setState] = useState<ResultsState>({ s: 'Loading' });

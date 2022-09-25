@@ -22,6 +22,10 @@ const httpTrigger: AzureFunction = async function (
 		cols: inputDocument.cols,
 		data: inputDocument.data,
 		total: inputDocument.total,
+
+		rowsPerCar: inputDocument.rowsPerCar,
+		spacings: inputDocument.spacings,
+		carDesign: inputDocument.carDesign,
 	};
 
 	context.res = {
