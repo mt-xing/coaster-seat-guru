@@ -6,11 +6,11 @@ import styles from '../styles/TrainEditor.module.css';
 
 export default function Splash(props: {finishSetup: (
 	rows: number, cols: number, state: TrainEditorState
-) => void}) {
+) => void, initialRows: number, initialCols: number}) {
 	const { finishSetup } = props;
 
-	const [rows, setRows] = useState<number>(0);
-	const [cols, setCols] = useState<number>(0);
+	const [rows, setRows] = useState<number>(props.initialRows);
+	const [cols, setCols] = useState<number>(props.initialCols);
 
 	const setColsSafe = useCallback((v: ChangeEvent<HTMLInputElement>) => {
 		const val = Math.floor(Number(v.target.value));

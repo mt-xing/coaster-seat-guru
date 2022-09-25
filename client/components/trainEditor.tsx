@@ -18,6 +18,14 @@ import outerStyles from '../styles/TrainEditor.module.css';
 export type TrainProps = {
 	initialRows?: number,
 	initialCols?: number,
+
+	complete: (
+		rows: number,
+		cols: number,
+		rowsPerCar: number | number[],
+		carDesign: CarShape | CarShape[],
+		spacings: boolean[][],
+	) => void,
 };
 
 export default function TrainEditor(props: TrainProps) {
@@ -41,6 +49,12 @@ export default function TrainEditor(props: TrainProps) {
 	useEffect(() => {
 		ReactTooltip.rebuild();
 	}, [allCarsSame]);
+
+	const { complete } = props;
+	const done = useCallback(() => {
+		if (!state) { return; }
+		complete(pRows, pCols, state.rowsPerCar, state.carDesign, state.spacings);
+	}, [complete, state, pRows, pCols]);
 
 	//
 	// #region State Mutation
@@ -315,7 +329,7 @@ export default function TrainEditor(props: TrainProps) {
 	//
 
 	if (state === undefined) {
-		return <Splash finishSetup={setupCallback} />;
+		return <Splash finishSetup={setupCallback} initialRows={pRows} initialCols={pCols} />;
 	}
 
 	return <>
@@ -339,7 +353,7 @@ export default function TrainEditor(props: TrainProps) {
 				renderRowGap={rowEdit}
 			/>
 		</div>
-		<PageSidebar state={state} rows={rows} setRows={setRows} reset={reset} />
+		<PageSidebar state={state} rows={rows} setRows={setRows} reset={reset} done={done} />
 	</>;
 	// #endregion
 }
@@ -349,9 +363,10 @@ function PageSidebar(props: {
 	rows: number[],
 	setRows: (evt: ChangeEvent<HTMLSelectElement>) => void,
 	reset: () => void,
+	done: () => void,
 }) {
 	const {
-		state, rows, setRows, reset
+		state, rows, setRows, reset, done
 	} = props;
 
 	const numCars = state.type !== 'custom' ? (rows.length / state.rowsPerCar) : state.rowsPerCar.length;
@@ -401,7 +416,7 @@ function PageSidebar(props: {
 			If each row articulates independently, please set 1 row per car.
 		</p></> : null}
 		<p className={outerStyles.instruction}>
-			<button className={outerStyles.confirmBtn}>Confirm ✅</button>
+			<button className={outerStyles.confirmBtn} onClick={done}>Confirm ✅</button>
 			<button className={outerStyles.confirmBtn} onClick={reset}>Start Over ❌</button>
 		</p>
 	</div>;
