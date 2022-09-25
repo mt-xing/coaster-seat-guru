@@ -6,26 +6,28 @@ import styles from '../styles/TrainEditor.module.css';
 
 export default function Splash(props: {finishSetup: (
 	rows: number, cols: number, state: TrainEditorState
-) => void, initialRows: number, initialCols: number}) {
-	const { finishSetup } = props;
+) => void, initialRows: number, initialCols: number, allowRowEdit: boolean}) {
+	const { finishSetup, allowRowEdit } = props;
 
 	const [rows, setRows] = useState<number>(props.initialRows);
 	const [cols, setCols] = useState<number>(props.initialCols);
 
 	const setColsSafe = useCallback((v: ChangeEvent<HTMLInputElement>) => {
+		if (!allowRowEdit) { return; }
 		const val = Math.floor(Number(v.target.value));
 		if (val < 0 || val > 100) {
 			return;
 		}
 		setCols(val);
-	}, [setCols]);
+	}, [setCols, allowRowEdit]);
 	const setRowsSafe = useCallback((v: ChangeEvent<HTMLInputElement>) => {
+		if (!allowRowEdit) { return; }
 		const val = Math.floor(Number(v.target.value));
 		if (val < 0 || val > 100) {
 			return;
 		}
 		setRows(val);
-	}, [setRows]);
+	}, [setRows, allowRowEdit]);
 
 	return <main>
 		<h2>Train Setup</h2>
@@ -40,14 +42,14 @@ export default function Splash(props: {finishSetup: (
 				<span className={styles.first}>Rows</span>{' '}
 				<span className={styles.second}>per Train</span>
 			</span>
-			<input type='number' min={0} max={100} value={rows} onChange={setRowsSafe} />
+			<input type='number' min={0} max={100} value={rows} onChange={setRowsSafe} disabled={!allowRowEdit} />
 		</label></p>
 		<p className={styles.numInputWrap}><label>
 			<span className={styles.wrap}>
 				<span className={styles.first}>Seats</span>{' '}
 				<span className={styles.second}>per Row</span>
 			</span>
-			<input type='number' min={0} max={100} value={cols} onChange={setColsSafe} />
+			<input type='number' min={0} max={100} value={cols} onChange={setColsSafe} disabled={!allowRowEdit} />
 		</label></p>
 		{
 			rows * cols === 0
