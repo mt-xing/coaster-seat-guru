@@ -1,5 +1,5 @@
 import React, {
-	Fragment, ReactNode, useCallback, useMemo
+	Fragment, ReactNode, useMemo
 } from 'react';
 import { CarShape } from 'model/trainEditorState';
 import styles from '../styles/Train.module.css';
@@ -15,7 +15,7 @@ export type TrainProps = {
 	/** IMPORTANT: Column is indexing the seats, EXCLUDING gaps */
 	render: (row: number, seatCol: number) => ReactNode,
 	/** IMPORTANT: Column is indexing total spaces, INCLUDING gaps */
-	renderGap?: (row: number, overallCol: number) => ReactNode,
+	renderGap: (row: number, overallCol: number) => ReactNode,
 
 	renderCarSide?: (car: number) => ReactNode,
 	renderColGap?: (row: number, col: number) => ReactNode,
@@ -104,7 +104,7 @@ function TrainCar(props: {
 	/** IMPORTANT: Column is indexing the seats, EXCLUDING gaps */
 	render: (row: number, seatCol: number) => ReactNode,
 	/** IMPORTANT: Column is indexing total spaces, INCLUDING gaps */
-	renderGap?: (row: number, overallCol: number) => ReactNode,
+	renderGap: (row: number, overallCol: number) => ReactNode,
 
 	renderCarSide?: (car: number) => ReactNode,
 	renderColGap?: (row: number, col: number) => ReactNode,
@@ -115,10 +115,6 @@ function TrainCar(props: {
 		lastCar, carNum, carType, spacings,
 		render, renderGap, renderCarSide, renderColGap, renderRowGap,
 	} = props;
-	const rg = useCallback(
-		((r: number, c: number) => (renderGap ? renderGap(r, c) : null)),
-		[renderGap]
-	);
 
 	return <><tr>
 		<td><table className={`${styles.coasterTrain} ${styles.coasterCar}${carType === 'circular' ? ` ${styles.roundCar}` : ''}`}>
@@ -134,7 +130,7 @@ function TrainCar(props: {
 									acc.v.push(<Fragment key={c}>
 										{seat
 											? render(r, acc.numSeats++)
-											: rg(r, c)
+											: renderGap(r, c)
 										}
 										{
 											renderColGap
