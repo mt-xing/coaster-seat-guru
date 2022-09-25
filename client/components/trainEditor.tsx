@@ -384,7 +384,7 @@ function RowEdit(props: {
 	splitRow: (x: number) => void,
 }) {
 	const {
-		rowsPerCar, r, mergeRow, splitRow
+		rowsPerCar, r, mergeRow, splitRow,
 	} = props;
 	const merge = useCallback(() => mergeRow(r), [r, mergeRow]);
 	const split = useCallback(() => splitRow(r), [r, splitRow]);
