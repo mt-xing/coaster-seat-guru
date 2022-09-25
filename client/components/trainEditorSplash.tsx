@@ -37,6 +37,11 @@ export default function Splash(props: {finishSetup: (
 			e.g. on B&amp;M hypers with staggered seating,
 			use two rows of two seats per car, not one row of four.
 		</p>
+		<p>
+			My site does not currently support variable numbers of seats per row.
+			<br />
+			If a train has a more esoteric design, please let me know.
+		</p>
 		<p className={styles.numInputWrap}><label>
 			<span className={styles.wrap}>
 				<span className={styles.first}>Rows</span>{' '}

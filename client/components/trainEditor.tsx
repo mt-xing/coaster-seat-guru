@@ -409,6 +409,11 @@ function PageSidebar(props: {
 					.map((r) => <option key={r} value={r + 1}>{r + 1}</option>)
 					.concat(<option key='custom'>Custom</option>)
 			}</select>
+			{
+				state.type !== 'custom'
+					? null
+					: <><br />Click between two rows to merge or split cars.</>
+			}
 		</p>
 		<p>{ maxRowsPerCar === 1 ? 'Each row in this train articulates independently.'
 			: `This train contains ${numCars === 1 ? '1 car' : `${numCars} cars`}, each with ${
