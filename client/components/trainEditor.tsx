@@ -10,6 +10,7 @@ import { assertUnreachable } from 'utils/assert';
 import SwitchSelector from 'react-switch-selector';
 import ReactTooltip from 'react-tooltip';
 import NoSsr from 'utils/noSsr';
+import Train from './train';
 import styles from '../styles/Train.module.css';
 
 export type TrainProps = {
@@ -228,7 +229,59 @@ export default function TrainEditor(props: TrainProps) {
 		}
 	}, [state, props.rows, allCarsSame]);
 
-	return <section className={`${styles.coaster} ${styles.trainEdit}`}>
+	//
+	// ==================
+	//  Render Functions
+	// ==================
+	//
+
+	const blankSeat = useCallback(() => <div
+		className='seat'
+		style={{
+			backgroundColor: 'rgb(128,128,128)',
+			height: '30px',
+			width: '30px',
+			margin: '0 5px',
+			display: 'inline-block',
+			verticalAlign: 'middle'
+		}}
+	></div>, []);
+
+	const gap = useCallback(
+		(r: number, c: number) => <DeleteSpaceBtn
+			r={r} c={c} state={state} removeSpace={removeSpace} />,
+		[state, removeSpace]
+	);
+
+	const sidebar = useCallback(
+		(carNum: number) => <SideBar
+			carNum={carNum} state={state}
+			setCarType={setCarType} changeToCustom={changeToCustom}
+		/>,
+		[state, setCarType, changeToCustom]
+	);
+
+	const addGap = useCallback((r: number, c: number) => ((state.type !== 'standard' || r < state.rowsPerCar)
+		? <div className={styles.spaceAdd} style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+			<button onClick={() => addSpace(r, c)}>+</button>
+		</div>
+		: null), [state, addSpace]);
+
+	const rowEdit = useCallback((r: number) => <RowEdit
+		key={r}
+		rowsPerCar={state.rowsPerCar}
+		r={r}
+		mergeRow={mergeRow}
+		splitRow={splitRow}
+	/>, [state, mergeRow, splitRow]);
+
+	//
+	// ========
+	//  Render
+	// ========
+	//
+
+	return <div>
 		<NoSsr>
 			<ReactTooltip effect='solid' backgroundColor='rgb(64,64,64)' />
 		</NoSsr>
@@ -238,169 +291,22 @@ export default function TrainEditor(props: TrainProps) {
 				.map((r) => <option key={r} value={r + 1}>{r + 1}</option>)
 				.concat(<option key='custom'>Custom</option>)
 		}</select></p>
-		<p>Front of train</p>
-		<table className={styles.coasterTrain}>
-			<tbody>
-				{
-					state.type !== 'custom' ? (
-						Array.from(Array(props.rows / state.rowsPerCar).keys())
-							.map((i) => <TrainCar
-								key={i}
-								carNum={i}
-								numRows={state.rowsPerCar}
-								cols={props.cols}
-								startingRow={i * state.rowsPerCar}
-								state={state}
-								lastCar={i === props.rows / state.rowsPerCar - 1}
-								mergeRow={mergeRow}
-								splitRow={splitRow}
-								addSpace={addSpace}
-								removeSpace={removeSpace}
-								setCarType={setCarType}
-								changeToCustom={changeToCustom}
-							/>)
-					) : (
-						state.rowsPerCar.map((carSplitLoc, carI) => <TrainCar
-							key={carI}
-							carNum={carI}
-							numRows={carI === 0 ? carSplitLoc + 1 : carSplitLoc - state.rowsPerCar[carI - 1]}
-							cols={props.cols}
-							startingRow={carI === 0 ? 0 : state.rowsPerCar[carI - 1] + 1}
-							state={state}
-							lastCar={carI === state.rowsPerCar.length - 1}
-							mergeRow={mergeRow}
-							splitRow={splitRow}
-							addSpace={addSpace}
-							removeSpace={removeSpace}
-							setCarType={setCarType}
-							changeToCustom={changeToCustom}
-						/>)
-					)
-				}
-			</tbody>
-		</table>
-	</section>;
-}
+		<Train
+			rows={props.rows}
+			cols={props.cols}
 
-function TrainCar(props: {
-	numRows: number,
-	cols: number,
-	startingRow: number,
-	state: TrainEditorState,
-	carNum: number,
-	lastCar: boolean,
-
-	mergeRow: (x: number) => void,
-	splitRow: (x: number) => void,
-	addSpace: (a: number, b: number) => void,
-	removeSpace: (a: number, b: number) => void,
-	setCarType: (value: CarShape, car: number) => void,
-	changeToCustom: (evt: ChangeEvent<HTMLInputElement>) => void,
-}) {
-	const rows = useMemo(() => Array.from(Array(props.numRows).keys()), [props.numRows]);
-	const {
-		state, lastCar, carNum, mergeRow, splitRow, addSpace, removeSpace, setCarType, changeToCustom
-	} = props;
-	const changeCarType = useCallback(
-		(v: unknown) => setCarType(v as CarShape, carNum),
-		[setCarType, carNum]
-	);
-	const carType = state.type === 'standard' ? state.carDesign : state.carDesign[carNum];
-	return <><tr>
-		<td><table className={`${styles.coasterTrain} ${styles.coasterCar}${carType === 'circular' ? ` ${styles.roundCar}` : ''}`}>
-			<tbody>
-				{rows.map((rRaw) => {
-					const r = rRaw + props.startingRow;
-					const colSpacings = state.type === 'standard' ? state.spacings[r % state.rowsPerCar] : state.spacings[r];
-					return <Fragment key={r}>
-						<tr>
-							<td>{r + 1}</td>
-							<td><div>
-								{colSpacings.map((seat, c) => <Fragment key={c}>
-									{seat
-										? <div
-											className='seat'
-											style={{
-												backgroundColor: 'rgb(128,128,128)',
-												height: '30px',
-												width: '30px',
-												margin: '0 5px',
-												display: 'inline-block',
-												verticalAlign: 'middle'
-											}}
-										></div>
-										: <DeleteSpaceBtn r={r} c={c} state={state} removeSpace={removeSpace} />
-									}
-									{ c !== (colSpacings.length - 1) && (state.type !== 'standard' || r < state.rowsPerCar)
-										? <div className={styles.spaceAdd} style={{ display: 'inline-block', verticalAlign: 'middle' }}>
-											<button onClick={() => addSpace(r, c)}>+</button>
-										</div>
-										: null }
-								</Fragment>)}
-							</div></td>
-						</tr>
-						{rRaw !== props.numRows - 1
-							? <RowEdit
-								rowsPerCar={state.rowsPerCar}
-								r={r}
-								mergeRow={mergeRow}
-								splitRow={splitRow}
-							/> : null
-						}
-					</Fragment>;
-				})}
-			</tbody>
-		</table></td>
-		<td className={styles.carOptions}><div className={styles.wrap}>{
-			(carNum === 0 || state.type !== 'standard')
-				? <div style={{ display: 'inline-block', width: '100px' }}><SwitchSelector
-					onChange={changeCarType}
-					options={[{
-						label: <div data-tip="Standard Car" style={{
-							width: '15px', height: '15px', margin: '5px 0', background: 'black', fontSize: 0, transform: 'translateX(-2px)'
-						}}>Standard Car</div>,
-						value: 'normal' as const,
-					}, {
-						label: <div data-tip="Spinning Car" style={{
-							width: '15px', height: '15px', margin: '5px', background: 'black', fontSize: 0, borderRadius: '15px', transform: 'translateX(-2px)'
-						}}>Spinning Car</div>,
-						value: 'circular' as const,
-					}]}
-					name={`selectorCar${carNum}`}
-					forcedSelectedIndex={carType === 'normal' ? 0 : 1}
-					backgroundColor={'rgba(230,230,230)'}
-					selectedBackgroundColor={'rgba(128,128,128)'}
-					fontColor={'black'}
-				/></div>
-				: null
-		}{
-			props.startingRow === 0
-				? <><div style={{ marginTop: '5px' }}><label style={{ display: 'flex', flexDirection: 'row' }}><input
-					type='checkbox'
-					checked={state.type === 'standard'}
-					onChange={changeToCustom}
-					disabled={state.type === 'custom'}
-					style={{ marginRight: '4px' }}
-				/> {state.type === 'custom'
-					? <div><del>Same design for all cars</del><br />
-						<small>Not available with custom cars</small></div>
-					: <div>Same design for all cars<br />
-						<small>Applies to seats and car shape</small></div>}</label></div>
-				</>
-				: null
-		}
-		</div></td>
-	</tr>
-	{!lastCar
-		? <RowEdit
-			key={`${props.startingRow}-${props.numRows}`}
 			rowsPerCar={state.rowsPerCar}
-			r={props.numRows - 1 + props.startingRow}
-			mergeRow={mergeRow}
-			splitRow={splitRow}
-		/> : null
-	}
-	</>;
+			carDesign={state.carDesign}
+			spacings={state.spacings}
+
+			render={blankSeat}
+			renderGap={gap}
+
+			renderCarSide={sidebar}
+			renderColGap={addGap}
+			renderRowGap={rowEdit}
+		/>
+	</div>;
 }
 
 function RowEdit(props: {
@@ -438,4 +344,58 @@ function DeleteSpaceBtn(props: {
 			? <button onClick={rem}><span>🗙</span></button>
 			: <>•</>
 	}</div>;
+}
+
+function SideBar(props: {
+	carNum: number,
+	state: TrainEditorState,
+	setCarType: (s: CarShape, n: number) => void,
+	changeToCustom: (evt: ChangeEvent<HTMLInputElement>) => void,
+}) {
+	const {
+		carNum, state, setCarType, changeToCustom
+	} = props;
+	const setType = useCallback(
+		(v: unknown) => setCarType(v as CarShape, carNum),
+		[carNum, setCarType]
+	);
+	return <div className={styles.wrap}>{
+		(carNum === 0 || state.type !== 'standard')
+			? <div style={{ display: 'inline-block', width: '100px' }}><SwitchSelector
+				onChange={setType}
+				options={[{
+					label: <div data-tip="Standard Car" style={{
+						width: '15px', height: '15px', margin: '5px 0', background: 'black', fontSize: 0, transform: 'translateX(-2px)'
+					}}>Standard Car</div>,
+					value: 'normal' as const,
+				}, {
+					label: <div data-tip="Spinning Car" style={{
+						width: '15px', height: '15px', margin: '5px', background: 'black', fontSize: 0, borderRadius: '15px', transform: 'translateX(-2px)'
+					}}>Spinning Car</div>,
+					value: 'circular' as const,
+				}]}
+				name={`selectorCar${carNum}`}
+				forcedSelectedIndex={(state.type === 'standard' ? state.carDesign : state.carDesign[carNum]) === 'normal' ? 0 : 1}
+				backgroundColor={'rgba(230,230,230)'}
+				selectedBackgroundColor={'rgba(128,128,128)'}
+				fontColor={'black'}
+			/></div>
+			: null
+	}{
+		carNum === 0
+			? <><div style={{ marginTop: '5px' }}><label style={{ display: 'flex', flexDirection: 'row' }}><input
+				type='checkbox'
+				checked={state.type === 'standard'}
+				onChange={changeToCustom}
+				disabled={state.type === 'custom'}
+				style={{ marginRight: '4px' }}
+			/> {state.type === 'custom'
+				? <div><del>Same design for all cars</del><br />
+					<small>Not available with custom cars</small></div>
+				: <div>Same design for all cars<br />
+					<small>Applies to seats and car shape</small></div>}</label></div>
+			</>
+			: null
+	}
+	</div>;
 }
