@@ -6,10 +6,10 @@ import {
 import { SyncLoader } from 'react-spinners';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import jwtDecode from 'jwt-decode';
-import { VotePayload } from '@apiTypes/vote';
+import { EditTrainPayload } from '@apiTypes/editTrain';
 import { GetCoasterResponse as QueryResult } from '@apiTypes/getCoaster';
 import TrainEditor from 'components/trainEditor';
+import { CarShape } from '@apiTypes/cosmos';
 import Footer from '../../components/footer';
 import Header from '../../components/header';
 import { assertUnreachable } from '../../utils/assert';
@@ -118,25 +118,34 @@ function TrainPage() {
 		}
 	}, [state, handleCredentialResponse, id, notFound, idReady]);
 
-	const submit = useCallback(() => {
+	const submit = useCallback((
+		_r: number,
+		_c: number,
+		rowsPerCar: number | number[],
+		carDesign: CarShape | CarShape[],
+		spacings: boolean[][],
+	) => {
 		if (state.s !== 'Ready') { return; }
 		if (state.submitting) { return; }
-		// setState({ ...state, submitting: true });
-		// void (async () => {
-		// 	const body: VotePayload = {
-		// 		token: state.token,
-		// 		votes: [],
-		// 	};
-		// 	const r = await fetch(`${API_ENDPOINT}Vote?id=${state.id}&uid=${jwtDecode<{sub: string}>(state.token).sub}`, {
-		// 		method: 'POST',
-		// 		body: JSON.stringify(body),
-		// 	});
-		// 	if (r.ok) {
-		// 		setState({ s: 'Done', id: state.id });
-		// 	} else {
-		// 		setState({ s: 'Error' });
-		// 	}
-		// })();
+		setState({ ...state, submitting: true });
+		void (async () => {
+			const body: EditTrainPayload = {
+				token: state.token,
+				id: state.id,
+				rowsPerCar,
+				carDesign,
+				spacings,
+			};
+			const r = await fetch(`${API_ENDPOINT}editTrain?id=${state.id}`, {
+				method: 'POST',
+				body: JSON.stringify(body),
+			});
+			if (r.ok) {
+				setState({ s: 'Done', id: state.id });
+			} else {
+				setState({ s: 'Error' });
+			}
+		})();
 	}, [state]);
 
 	// eslint-disable-next-line no-restricted-globals
@@ -157,11 +166,12 @@ function TrainPage() {
 			return <main className={styles.main}>
 				<h1>{state.name}</h1>
 				<h2>{state.park}</h2>
-				<TrainEditor
+				{state.submitting ? <SyncLoader /> : <TrainEditor
 					complete={submit}
 					initialRows={state.rows}
 					initialCols={state.cols}
 					allowRowEdit={false} />
+				}
 			</main>;
 		case 'Done':
 			return <div className={styles.load}>
