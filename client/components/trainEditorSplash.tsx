@@ -91,9 +91,11 @@ const renderTemplate = (
 	template: SeatTemplate
 ) => (
 	template.validator(rows, cols)
-		? <li><button onClick={() => finishSetup(rows, cols, template.mapping(rows, cols))}>
-			{template.layout(cols)}<br />{template.text}
-		</button></li>
+		? <li key={template.text}>
+			<button onClick={() => finishSetup(rows, cols, template.mapping(rows, cols))}>
+				{template.layout(cols)}<br />{template.text}
+			</button>
+		</li>
 		: null
 );
 
