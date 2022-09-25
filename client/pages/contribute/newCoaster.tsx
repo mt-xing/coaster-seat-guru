@@ -145,7 +145,7 @@ function SubmitCoasterPage() {
 		case 'Ready':
 			if (editTrain) {
 				return <main className={styles.main}>
-					<h1>New Coaster</h1>
+					<h1>Train Editor</h1>
 					<h2>{name} - {park}</h2>
 					<TrainEditor
 						allowRowEdit={true}
