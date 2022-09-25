@@ -12,6 +12,7 @@ import ReactTooltip from 'react-tooltip';
 import NoSsr from 'utils/noSsr';
 import Train from './train';
 import styles from '../styles/Train.module.css';
+import outerStyles from '../styles/TrainEditor.module.css';
 
 export type TrainProps = {
 	rows: number,
@@ -41,6 +42,13 @@ export default function TrainEditor(props: TrainProps) {
 	useEffect(() => {
 		ReactTooltip.rebuild();
 	}, [allCarsSame]);
+
+	//
+	// #region State Mutation
+	// ================
+	//  State Mutation
+	// ================
+	//
 
 	const setRows = useCallback((evt: ChangeEvent<HTMLSelectElement>) => {
 		if (evt.target.value !== 'Custom') {
@@ -229,7 +237,10 @@ export default function TrainEditor(props: TrainProps) {
 		}
 	}, [state, props.rows, allCarsSame]);
 
+	// #endregion
+
 	//
+	// #region Render Functions
 	// ==================
 	//  Render Functions
 	// ==================
@@ -275,37 +286,94 @@ export default function TrainEditor(props: TrainProps) {
 		splitRow={splitRow}
 	/>, [state, mergeRow, splitRow]);
 
+	// #endregion
+
 	//
+	// #region Render
 	// ========
 	//  Render
 	// ========
 	//
 
-	return <div>
+	return <>
 		<NoSsr>
 			<ReactTooltip effect='solid' backgroundColor='rgb(64,64,64)' />
 		</NoSsr>
-		<p>Rows per car: <select onChange={setRows} value={state.type === 'custom' ? 'Custom' : state.rowsPerCar}>{
-			rows
-				.filter((x) => props.rows % (x + 1) === 0)
-				.map((r) => <option key={r} value={r + 1}>{r + 1}</option>)
-				.concat(<option key='custom'>Custom</option>)
-		}</select></p>
-		<Train
-			rows={props.rows}
-			cols={props.cols}
+		<div className={outerStyles.side}>
+			<Train
+				rows={props.rows}
+				cols={props.cols}
 
-			rowsPerCar={state.rowsPerCar}
-			carDesign={state.carDesign}
-			spacings={state.spacings}
+				rowsPerCar={state.rowsPerCar}
+				carDesign={state.carDesign}
+				spacings={state.spacings}
 
-			render={blankSeat}
-			renderGap={gap}
+				render={blankSeat}
+				renderGap={gap}
 
-			renderCarSide={sidebar}
-			renderColGap={addGap}
-			renderRowGap={rowEdit}
-		/>
+				renderCarSide={sidebar}
+				renderColGap={addGap}
+				renderRowGap={rowEdit}
+			/>
+		</div>
+		<PageSidebar state={state} rows={rows} setRows={setRows} />
+	</>;
+	// #endregion
+}
+
+function PageSidebar(props: {
+	state: TrainEditorState,
+	rows: number[],
+	setRows: (evt: ChangeEvent<HTMLSelectElement>) => void
+}) {
+	const { state, rows, setRows } = props;
+
+	const numCars = state.type !== 'custom' ? (rows.length / state.rowsPerCar) : state.rowsPerCar.length;
+	const maxRowsPerCar = useMemo(
+		() => (state.type !== 'custom'
+			? state.rowsPerCar
+			: state.rowsPerCar.reduce((a, x, i, arr) => Math.max(a, i === 0 ? x : x - arr[i - 1]), 0)),
+		[state]
+	);
+
+	return <div className={`${outerStyles.side} ${outerStyles.sidebar}`}>
+		<section className={outerStyles.instruction}>
+			Edit the train to match the layout of the ride.
+		</section>
+		<p>
+			Use the circular shape for spinning cars
+			Otherwise, keep the cars rectangular, regardless of shape.
+		</p>
+		<p>
+			Add spaces between seats (the little +) to represent variations in spacing in real life.
+			If all seats are equally far apart, no need to add spaces.
+		</p>
+		<p>
+			If RCDB contradicts the park, defer to the park.
+			<br />
+			e.g. on B&amp;M hypers with staggered seating,
+			use two rows of two seats, not one row of four.
+		</p>
+		<p className={outerStyles.instruction}>
+			Rows per car: <select onChange={setRows} value={state.type === 'custom' ? 'Custom' : state.rowsPerCar}>{
+				rows
+					.filter((x) => rows.length % (x + 1) === 0)
+					.map((r) => <option key={r} value={r + 1}>{r + 1}</option>)
+					.concat(<option key='custom'>Custom</option>)
+			}</select>
+		</p>
+		<p>{ maxRowsPerCar === 1 ? 'Each row in this train articulates independently.'
+			: `This train contains ${numCars} cars, each with ${
+				state.type !== 'custom' ? state.rowsPerCar : 'a custom number of'
+			} rows.`
+		}</p>
+		{maxRowsPerCar > 3 ? <><p className={outerStyles.warn}>
+			This train has more than three rows per car.
+			This is quite unusual, in my experience.
+			Are you sure you set the right settings?
+		</p><p>
+			If each row articulates independently, please set 1 row per car.
+		</p></> : null}
 	</div>;
 }
 

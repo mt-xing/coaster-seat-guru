@@ -1,0 +1,20 @@
+.side {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.sidebar {
+	width: 400px;
+	max-width: 100%;
+	padding-top: 30px;
+}
+
+.instruction {
+	padding: 20px;
+	background: rgb(230, 230, 230);
+}
+
+.warn {
+	font-weight: bold;
+	color: red;
+}
