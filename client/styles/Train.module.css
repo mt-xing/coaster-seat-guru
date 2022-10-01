@@ -27,7 +27,7 @@
     cursor: pointer;
 }
 
-.coasterTrain button {
+.coasterTrain button, .coasterTrain td .seat {
     border: none;
     box-shadow: 0 0 1px 1px black;
     transition: box-shadow 0.1s ease-in-out;
@@ -47,4 +47,243 @@
     height: initial;
     font-size: 20px;
     line-height: 30px;
+}
+
+.trainEdit td {
+    position: relative;
+    overflow: visible;
+    text-align: center;
+    width: initial;
+}
+
+.trainEdit button.rowBtn {
+    position: absolute;
+    background: none;
+    border: none;
+    box-shadow: none;
+
+    padding: 0;
+    height: 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto;
+    width: 100%;
+    transform: translateY(-50%);
+    
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.trainEdit button.del {
+    font-size: 10px;
+}
+
+.trainEdit button.rowBtn:hover, .trainEdit button.rowBtn:focus {
+    opacity: 1;
+}
+
+.trainEdit button.rowBtn span {
+    background: white;
+    padding: 0 5px;
+}
+
+.trainEdit button.rowBtn::after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0; top: 50%; right: 0;
+    height: 1px;
+    z-index: -1;
+}
+
+.trainEdit button.add span {
+    background: rgb(230, 230, 230);
+}
+
+.trainEdit button.add::after {
+    border-top: 1px green dotted;
+}
+
+.trainEdit button.del::after {
+    border-top: 1px red solid;
+}
+
+.trainEdit button.rowBtn::before {
+    position: absolute;
+    text-align: right;
+    font-size: 14px;
+
+    white-space: nowrap;
+
+    color: white;
+    padding: 2px 5px;
+    right: -5px;
+
+    pointer-events: none;
+
+    transform: translateX(100%)scaleX(0);
+    transform-origin: left center;
+    opacity: 0;
+    transition: transform 0.5s ease-in, opacity 0.4s ease-in;
+}
+
+.trainEdit button.del::before {
+    content: 'Merge cars';
+    background: red;
+}
+
+.trainEdit button.add::before {
+    content: 'Split car';
+    background: green;
+    right: -10px;
+}
+
+.trainEdit button.rowBtn:hover::before, .trainEdit button.rowBtn:focus::before {
+    opacity: 1;
+    transform: translateX(100%)scaleX(1);
+    transition: transform 0.2s ease-out, opacity 0.3s ease-out;
+}
+
+.trainEdit button.rowBtn:active {
+    color: white;
+}
+
+.trainEdit .spaceAdd {
+    width: 0;
+    height: 30px;
+    position: relative;
+}
+
+.trainEdit .spaceAdd button {
+    position: absolute;
+
+    background: none;
+    box-shadow: none;
+    left: 50%;
+    top: 50%;
+    padding: 0;
+    width: 15px;
+    transform: translate(-50%, -50%);
+}
+
+.trainEdit .spaceAdd button::after, .trainEdit .spaceDel button::after {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    padding: 2px 5px;
+    box-shadow: black 0 0 5px 1px;
+
+    opacity: 0;
+    transform: scaleY(0)translateX(-50%);
+    pointer-events: none;
+    transform-origin: bottom center;
+
+    transition: opacity 0.5s ease-in, transform 0.5s ease-in;
+}
+
+.trainEdit .spaceAdd button::after {
+    content: 'Add space';
+    background: white;
+    color: black;
+}
+
+.trainEdit .spaceDel button::after {
+    content: 'Remove space';
+    background: black;
+    color: white;
+}
+
+.trainEdit .spaceAdd button:hover::after, .trainEdit .spaceAdd button:focus::after, .trainEdit .spaceDel button:hover::after, .trainEdit .spaceDel button:focus::after {
+    opacity: 1;
+    transform: scaleY(1)translateX(-50%);
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.trainEdit .spaceDel {
+    height: 30px;
+    width: 30px;
+    margin: 0 5px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.trainEdit .spaceDel button {
+    box-sizing: border-box;
+    border: 1px gray solid;
+    box-shadow: none;
+    vertical-align: top;
+    background: none;
+    
+    position: relative;
+}
+
+.trainEdit .spaceDel button:hover, .trainEdit .spaceDel button:focus {
+    border: 1px black solid;
+}
+
+.trainEdit .spaceDel button:active {
+    border: none;
+}
+
+.trainEdit .spaceDel button span {
+    display: inline-block;
+    margin-top: -1px;
+}
+
+.coasterCar {
+    background: rgb(230, 230, 230);
+    border-radius: 10px;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+}
+
+.coasterCar td:first-child {
+    width: 40px;
+    white-space: nowrap;
+}
+
+.coasterCar td:nth-child(2) {
+    white-space: nowrap;
+}
+
+.coasterTrain .carOptions {
+    font-size: 14px;
+    text-align: left;
+    position: relative;
+    min-width: 200px;
+}
+
+.coasterTrain .carOptions .wrap {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.coasterTrain .carOptions p {
+    text-align: left;
+}
+
+.coasterTrain .carOptions input[type="checkbox"] {
+    height: 18px;
+    width: 18px;
+}
+
+.roundCar {
+    background: none;
+    position: relative;
+    padding-bottom: 5px;
+}
+
+.roundCar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 42px;
+    width: calc(100% - 42px); height: 100%;
+    background: rgb(230, 230, 230);
+    border-radius: 50%;
 }

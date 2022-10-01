@@ -108,6 +108,17 @@ function ResultsPage() {
 		</>;
 	}, []);
 
+	const blankSeat = useCallback(() => <div
+		className='seat'
+		style={{
+			height: '30px',
+			width: '30px',
+			margin: '0 5px',
+			display: 'inline-block',
+			verticalAlign: 'middle'
+		}}
+	></div>, []);
+
 	return useCallback(() => {
 		switch (state.s) {
 		case 'Loading':
@@ -131,6 +142,7 @@ function ResultsPage() {
 						style={{ backgroundColor: state.heatmap.colorOfScore(state.data[r][c]) }}
 						onClick={() => setSelected(r, c)}
 					></button>}
+					renderGap={blankSeat}
 				/>
 				<section className={styles.details}>
 					{state.selected === null
@@ -146,7 +158,7 @@ function ResultsPage() {
 		default:
 			return assertUnreachable(state);
 		}
-	}, [id, state, setSelected, getSelectionDetails])();
+	}, [id, state, setSelected, getSelectionDetails, blankSeat])();
 }
 
 const Results: NextPage = () => (

@@ -181,6 +181,17 @@ function VotePage() {
 	// eslint-disable-next-line no-restricted-globals
 	const reload = useCallback(() => location.reload(), []);
 
+	const blankSeat = useCallback(() => <div
+		className='seat'
+		style={{
+			height: '30px',
+			width: '30px',
+			margin: '0 5px',
+			display: 'inline-block',
+			verticalAlign: 'middle'
+		}}
+	></div>, []);
+
 	return useCallback(() => {
 		switch (state.s) {
 		case 'Unauthenticated':
@@ -217,6 +228,7 @@ function VotePage() {
 						default: throw new Error();
 						}
 					}}
+					renderGap={blankSeat}
 				/>
 				<section className={styles.details}>
 					<div className={styles.progress}>
@@ -278,7 +290,7 @@ function VotePage() {
 		default:
 			return assertUnreachable(state);
 		}
-	}, [state, changeSelected, instrs, setStep, submit, reload])();
+	}, [state, changeSelected, instrs, setStep, submit, reload, blankSeat])();
 }
 
 const Contribute: NextPage = () => (
