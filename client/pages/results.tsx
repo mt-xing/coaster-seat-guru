@@ -6,6 +6,7 @@ import {
 import { SyncLoader } from 'react-spinners';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { GetCoasterResponse as QueryResult } from '@apiTypes/getCoaster';
 import Footer from '../components/footer';
 import Header from '../components/header';
 import { assertUnreachable } from '../utils/assert';
@@ -24,16 +25,6 @@ type ResultsState = {
 	selected: { row: number, col: number } | null,
 	heatmap: HeatMap,
 } & QueryResult);
-
-type QueryResult = {
-	id: string,
-	name: string,
-	park: string,
-	rows: number,
-	cols: number,
-	data: [number, number, number][][],
-	total: number,
-};
 
 function ResultsPage() {
 	const [state, setState] = useState<ResultsState>({ s: 'Loading' });
@@ -63,7 +54,7 @@ function ResultsPage() {
 		}
 
 		const f = async () => {
-			const result = await fetch(`${API_ENDPOINT}GetCoaster?id=${id}`);
+			const result = await fetch(`${API_ENDPOINT}getCoaster?id=${id}`);
 			if (!result.ok) {
 				notFound();
 				return;
@@ -139,10 +130,13 @@ function ResultsPage() {
 					rows={state.rows}
 					cols={state.cols}
 					render={(r, c) => <button
-						style={{ backgroundColor: state.heatmap.colorOfScore(state.data[r][c]) }}
+						style={{ backgroundColor: state.heatmap.colorOfScore(state.data[r][c]), margin: '0 5px' }}
 						onClick={() => setSelected(r, c)}
 					></button>}
 					renderGap={blankSeat}
+					carDesign={state.carDesign}
+					spacings={state.spacings}
+					rowsPerCar={state.rowsPerCar}
 				/>
 				<section className={styles.details}>
 					{state.selected === null
@@ -153,6 +147,14 @@ function ResultsPage() {
 						If something is wrong with this page,<br />please let me know on <a href='https://www.reddit.com/r/rollercoasters/comments/tkwcol/other_i_built_coasterseatgurucom_for_people_to/'>reddit</a>.
 					</p>
 					<Link href={`/contribute?id=${id}`}><a className={`${btnStyle.bigBtn} ${styles.voteBtn}`}>Vote on your favorite seats</a></Link>
+					{
+						!state.carDesign || !state.spacings || !state.rowsPerCar
+							? <p>
+								This coaster is missing train data :(<br />
+								<Link href={`/contribute/coasterTrain?id=${id}`}><a className={`${btnStyle.bigBtn} ${styles.voteBtn}`}>Would you like to add it?</a></Link>
+							</p>
+							: null
+					}
 				</section>
 			</main>;
 		default:

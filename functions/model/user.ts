@@ -1,5 +1,5 @@
 export type UserDoc = {
-	id: string, submitted: Record<number, (number|null)[][]>
+	id: string, submitted: Record<string, (number|null)[][]>
 };
 
 export class User {
@@ -12,7 +12,7 @@ export class User {
 		this.#doc = doc;
 	}
 
-	getVotes(coasterId: number): (number|null)[][] | null {
+	getVotes(coasterId: string): (number|null)[][] | null {
 		if (!this.#doc) {
 			return null;
 		}
@@ -23,7 +23,7 @@ export class User {
 		return c;
 	}
 
-	updateVotes(coasterId: number, votes: (number|null)[][]): UserDoc {
+	updateVotes(coasterId: string, votes: (number|null)[][]): UserDoc {
 		if (!this.#doc) {
 			this.#doc = {
 				id: this.#sub,

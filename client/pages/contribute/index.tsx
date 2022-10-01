@@ -8,6 +8,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import jwtDecode from 'jwt-decode';
 import { VotePayload } from '@apiTypes/vote';
+import { GetCoasterResponse as QueryResult } from '@apiTypes/getCoaster';
+import { CarShape } from '@apiTypes/cosmos';
 import Footer from '../../components/footer';
 import Header from '../../components/header';
 import { assertUnreachable } from '../../utils/assert';
@@ -34,19 +36,22 @@ type ResultsState = {
 	step: Step,
 	selected: (Step | undefined)[][],
 	submitting: boolean,
-} & QueryResult) | {
+} & UsefulQueryResult) | {
 	s: 'Done',
 	id: string,
 } | {
 	s: 'Error',
 };
 
-type QueryResult = {
+type UsefulQueryResult = {
 	id: string,
 	name: string,
 	park: string,
 	rows: number,
 	cols: number,
+	spacings?: boolean[][],
+	carDesign?: CarShape | CarShape[],
+	rowsPerCar?: number | number[],
 };
 
 declare const google: {
@@ -106,7 +111,7 @@ function VotePage() {
 					notFound();
 					return;
 				}
-				const result = await fetch(`${API_ENDPOINT}GetCoaster?id=${id}`);
+				const result = await fetch(`${API_ENDPOINT}getCoaster?id=${id}`);
 				if (!result.ok) {
 					notFound();
 					return;
@@ -125,6 +130,10 @@ function VotePage() {
 					selected: numRows.map(() => numCols.map(() => undefined)),
 					step: 1,
 					submitting: false,
+
+					spacings: r.spacings,
+					rowsPerCar: r.rowsPerCar,
+					carDesign: r.carDesign,
 				});
 			};
 			void f();
@@ -210,23 +219,21 @@ function VotePage() {
 				<Train
 					rows={state.rows}
 					cols={state.cols}
+					carDesign={state.carDesign}
+					rowsPerCar={state.rowsPerCar}
+					spacings={state.spacings}
 					render={(r, c) => {
 						if (state.selected[r][c] === undefined || state.selected[r][c] === state.step) {
 							return <input
 								type='checkbox'
 								checked={state.selected[r][c] === state.step}
 								onChange={(v) => changeSelected(r, c, v.target.checked ? state.step : undefined)}
+								style={{ margin: '0 5px' }}
 							/>;
 						}
-						switch (state.selected[r][c]) {
-						case 1:
-							return '🟢';
-						case 2:
-							return '➕';
-						case 3:
-							return '⛔';
-						default: throw new Error();
-						}
+						return <span style={{ margin: '0 5px', width: '30px', display: 'inline-block' }}>
+							{getIcon(state.selected[r][c])}
+						</span>;
 					}}
 					renderGap={blankSeat}
 				/>
@@ -304,5 +311,17 @@ const Contribute: NextPage = () => (
 		<Footer isDark={false} />
 	</>
 );
+
+const getIcon = (s: Step | undefined) => {
+	switch (s) {
+	case 1:
+		return '🟢';
+	case 2:
+		return '➕';
+	case 3:
+		return '⛔';
+	default: throw new Error();
+	}
+};
 
 export default Contribute;

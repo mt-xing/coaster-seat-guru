@@ -1,6 +1,7 @@
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import { verifyToken } from '../model/auth';
-import { CreateCoasterPayload } from '../types/createCoaster';
+import { CoasterDoc } from '../types/cosmos';
+import { CreateCoasterPayload, isLegitTrain } from '../types/createCoaster';
 
 const httpTrigger: AzureFunction = async function (
 	context: Context, req: HttpRequest, inputDocument,
@@ -49,6 +50,20 @@ const httpTrigger: AzureFunction = async function (
 		return;
 	}
 
+	const {
+		spacings, carDesign, rowsPerCar,
+	} = body;
+
+	if (!spacings || !carDesign || !rowsPerCar) {
+		context.res = { status: 400 };
+		return;
+	}
+
+	if (!isLegitTrain(rows, cols, rowsPerCar, carDesign, spacings)) {
+		context.res = { status: 400 };
+		return;
+	}
+
 	context.bindings.outputDocument = JSON.stringify({
 		id,
 		name,
@@ -60,7 +75,10 @@ const httpTrigger: AzureFunction = async function (
 			(_) => Array.from(Array(cols).keys()).map((_y) => [0, 0, 0]),
 		),
 		total: 0,
-	});
+		spacings,
+		carDesign,
+		rowsPerCar,
+	} as CoasterDoc);
 
 	context.res = {
 		status: 200,

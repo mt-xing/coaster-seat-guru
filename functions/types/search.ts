@@ -1,5 +1,5 @@
 export type SearchResponse = {
-	id: number,
+	id: string,
 	name: string,
 	park: string,
 };

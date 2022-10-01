@@ -1,11 +1,12 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import {
-	ChangeEvent,
 	useCallback, useEffect, useMemo, useState
 } from 'react';
 import Link from 'next/link';
 import { CreateCoasterPayload } from '@apiTypes/createCoaster';
+import { CarShape } from '@apiTypes/cosmos';
+import TrainEditor from 'components/trainEditor';
 import Footer from '../../components/footer';
 import Header from '../../components/header';
 import { assertUnreachable } from '../../utils/assert';
@@ -55,23 +56,7 @@ function SubmitCoasterPage() {
 	const [name, setName] = useState('');
 	const [park, setPark] = useState('');
 	const [rcdb, setRcdb] = useState('');
-	const [rows, setRows] = useState(0);
-	const [cols, setCols] = useState(0);
-
-	const setColsSafe = useCallback((v: ChangeEvent<HTMLInputElement>) => {
-		const val = Math.floor(Number(v.target.value));
-		if (val < 0 || val > 100) {
-			return;
-		}
-		setCols(val);
-	}, [setCols]);
-	const setRowsSafe = useCallback((v: ChangeEvent<HTMLInputElement>) => {
-		const val = Math.floor(Number(v.target.value));
-		if (val < 0 || val > 100) {
-			return;
-		}
-		setRows(val);
-	}, [setRows]);
+	const [editTrain, setEditTrain] = useState(false);
 
 	const handleCredentialResponse = useCallback((response: {credential: string}) => {
 		const token = response.credential;
@@ -102,7 +87,15 @@ function SubmitCoasterPage() {
 		}
 	}, [state, handleCredentialResponse]);
 
-	const submit = useCallback(() => {
+	const proceed = useCallback(() => setEditTrain(true), []);
+
+	const submit = useCallback((
+		rows: number,
+		cols: number,
+		rowsPerCar: number | number[],
+		carDesign: CarShape | CarShape[],
+		spacings: boolean[][],
+	) => {
 		if (state.s !== 'Ready') { return; }
 		if (state.submitting) { return; }
 		const rcdbMatch = rcdbPattern.exec(rcdb);
@@ -120,8 +113,11 @@ function SubmitCoasterPage() {
 				park,
 				rows,
 				cols,
+				rowsPerCar,
+				carDesign,
+				spacings,
 			};
-			const r = await fetch(`${API_ENDPOINT}CreateCoaster?id=${id}`, {
+			const r = await fetch(`${API_ENDPOINT}createCoaster?id=${id}`, {
 				method: 'POST',
 				body: JSON.stringify(body),
 			});
@@ -131,14 +127,13 @@ function SubmitCoasterPage() {
 				setState({ s: 'Error', msg: 'Sorry, an error occurred' });
 			}
 		})();
-	}, [state, name, park, rows, cols, rcdb]);
+	}, [state, name, park, rcdb]);
 
 	const canSubmit = useMemo(() => {
 		if (state.s !== 'Ready' || state.submitting) { return false; }
 		if (name === '' || park === '' || rcdb === '') { return false; }
-		if (rows === 0 || cols === 0) { return false; }
 		return rcdbPattern.test(rcdb);
-	}, [state, name, park, rows, cols, rcdb]);
+	}, [state, name, park, rcdb]);
 
 	// eslint-disable-next-line no-restricted-globals
 	const reload = useCallback(() => location.reload(), []);
@@ -148,6 +143,16 @@ function SubmitCoasterPage() {
 		case 'Unauthenticated':
 			return <AuthBlocker />;
 		case 'Ready':
+			if (editTrain) {
+				return <main className={styles.main}>
+					<h1>Train Editor</h1>
+					<h2>{name} - {park}</h2>
+					<TrainEditor
+						allowRowEdit={true}
+						complete={submit}
+					/>
+				</main>;
+			}
 			return <main className={styles.main}>
 				<h1>New Coaster</h1>
 				<p>Thanks for making this site better.</p>
@@ -163,29 +168,12 @@ function SubmitCoasterPage() {
 					{'RCDB Link: '}
 					<input type='text' placeholder='https://rcdb.com/???.html' value={rcdb} onChange={(v) => setRcdb(v.target.value)} />
 				</label></p>
-				<p><label>
-					{'Rows per Train: '}
-					<input type='number' min={0} max={100} value={rows} onChange={setRowsSafe} />
-				</label></p>
-				<p><label>
-					{'Seats per Row: '}
-					<input type='number' min={0} max={100} value={cols} onChange={setColsSafe} />
-				</label></p>
-				{
-					rows * cols === 0
-						? null
-						: <p>Just to confirm, each train sits {rows} &times; {cols} = {rows * cols} people.</p>
-				}
-				<p>
-					My site currently only supports rectangular layouts.
-					If a train has a more esoteric design, please let me know.
-				</p>
 				<p>
 					<button
 						className={btnStyle.bigBtn}
 						disabled={!canSubmit}
-						onClick={submit}
-					>Submit</button>
+						onClick={proceed}
+					>Next</button>
 				</p>
 			</main>;
 		case 'Done':
@@ -202,7 +190,7 @@ function SubmitCoasterPage() {
 		default:
 			return assertUnreachable(state);
 		}
-	}, [state, submit, reload, name, park, rows, cols, rcdb, setColsSafe, setRowsSafe, canSubmit])();
+	}, [state, reload, name, park, rcdb, canSubmit, proceed, submit, editTrain])();
 }
 
 const SubmitCoaster: NextPage = () => (

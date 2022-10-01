@@ -1,4 +1,6 @@
-export type CarShape = 'normal' | 'circular';
+import { CarShape } from '@apiTypes/cosmos';
+
+export type { CarShape } from '@apiTypes/cosmos';
 
 export type StandardTrainState = {
 	type: 'standard',

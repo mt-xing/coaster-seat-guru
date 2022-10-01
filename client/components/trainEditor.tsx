@@ -15,9 +15,10 @@ import Splash from './trainEditorSplash';
 import styles from '../styles/Train.module.css';
 import outerStyles from '../styles/TrainEditor.module.css';
 
-export type TrainProps = {
+export type TrainEditorProps = {
 	initialRows?: number,
 	initialCols?: number,
+	allowRowEdit: boolean,
 
 	complete: (
 		rows: number,
@@ -28,7 +29,7 @@ export type TrainProps = {
 	) => void,
 };
 
-export default function TrainEditor(props: TrainProps) {
+export default function TrainEditor(props: TrainEditorProps) {
 	const [state, setState] = useState<TrainEditorState | undefined>(undefined);
 	const [pRows, setPRows] = useState<number>(props.initialRows ?? 0);
 	const [pCols, setPCols] = useState<number>(props.initialCols ?? 0);
@@ -64,10 +65,12 @@ export default function TrainEditor(props: TrainProps) {
 	//
 
 	const setupCallback = useCallback((r: number, c: number, s: TrainEditorState) => {
-		setPRows(r);
-		setPCols(c);
+		if (props.allowRowEdit) {
+			setPRows(r);
+			setPCols(c);
+		}
 		setState(s);
-	}, []);
+	}, [props.allowRowEdit]);
 
 	const reset = useCallback(() => {
 		// eslint-disable-next-line no-restricted-globals, no-alert
@@ -329,7 +332,11 @@ export default function TrainEditor(props: TrainProps) {
 	//
 
 	if (state === undefined) {
-		return <Splash finishSetup={setupCallback} initialRows={pRows} initialCols={pCols} />;
+		return <Splash
+			finishSetup={setupCallback}
+			initialRows={pRows}
+			initialCols={pCols}
+			allowRowEdit={props.allowRowEdit} />;
 	}
 
 	return <>
@@ -402,6 +409,11 @@ function PageSidebar(props: {
 					.map((r) => <option key={r} value={r + 1}>{r + 1}</option>)
 					.concat(<option key='custom'>Custom</option>)
 			}</select>
+			{
+				state.type !== 'custom'
+					? null
+					: <><br />Click between two rows to merge or split cars.</>
+			}
 		</p>
 		<p>{ maxRowsPerCar === 1 ? 'Each row in this train articulates independently.'
 			: `This train contains ${numCars === 1 ? '1 car' : `${numCars} cars`}, each with ${
@@ -417,7 +429,7 @@ function PageSidebar(props: {
 		</p></> : null}
 		<p className={outerStyles.instruction}>
 			<button className={outerStyles.confirmBtn} onClick={done}>Confirm ✅</button>
-			<button className={outerStyles.confirmBtn} onClick={reset}>Start Over ❌</button>
+			<button className={outerStyles.confirmBtn} onClick={reset}>Reset Train ❌</button>
 		</p>
 	</div>;
 }
