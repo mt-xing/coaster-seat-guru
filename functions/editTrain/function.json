@@ -32,7 +32,7 @@
       "collectionName": "Coasters",
       "createIfNotExists": false,
       "connectionStringSetting": "CosmosDbConnectionString"
-    },
+    }
   ],
   "scriptFile": "../dist/editTrain/index.js"
 }
