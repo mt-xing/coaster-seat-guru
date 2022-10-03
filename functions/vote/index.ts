@@ -108,6 +108,10 @@ const httpTrigger: AzureFunction = async function (
 		cols: inputDocument.cols,
 		data: inputDocument.data,
 		total: inputDocument.total + (userPreviousVote !== null ? 0 : 1),
+
+		rowsPerCar: inputDocument.rowsPerCar,
+		spacings: inputDocument.spacings,
+		carDesign: inputDocument.carDesign,
 	});
 
 	context.res = {
