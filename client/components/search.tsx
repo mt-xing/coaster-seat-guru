@@ -1,5 +1,7 @@
 import Link from 'next/link';
-import { ChangeEvent, useCallback, useState } from 'react';
+import {
+	ChangeEvent, useCallback, useMemo, useState
+} from 'react';
 import { SyncLoader } from 'react-spinners';
 import styles from '../styles/Search.module.css';
 import { assertUnreachable } from '../utils/assert';
@@ -20,12 +22,13 @@ type ListStatus = {
 	list: QueryResponse[]
 };
 
-export default function Search() {
-	const [query, setQuery] = useState('');
-	const [debounce, setDebounce] = useState<number | null>(null);
-	const [list, setList] = useState<ListStatus>({ s: 'hidden' });
-
-	const executeQuery = useCallback(async (q: string) => {
+const fetchUniqueQuery = (() => {
+	let nonce = 0;
+	return async (
+		setList: (l: ListStatus) => void,
+		setDebounce: (d: number | null) => void,
+		q: string,
+	) => {
 		setDebounce(null);
 		const val = q.replace(/[\W_]+/g, '').toLowerCase();
 		if (val === '') {
@@ -37,9 +40,27 @@ export default function Search() {
 			setList({ s: 'hidden' });
 			return;
 		}
+		nonce++;
+		const cn = nonce;
 		const r = await result.json() as QueryResponse[];
+		if (nonce !== cn) {
+			// Another query got in first; abandon
+			return;
+		}
 		setList({ s: 'displayed', list: r });
-	}, [setList, setDebounce]);
+	};
+})();
+
+export default function Search() {
+	const [query, setQuery] = useState('');
+	const [debounce, setDebounce] = useState<number | null>(null);
+	const [list, setList] = useState<ListStatus>({ s: 'hidden' });
+
+	const executeQuery = useMemo(() => fetchUniqueQuery.bind(
+		{},
+		setList,
+		setDebounce
+	), [setList, setDebounce]);
 
 	const clearQuery = useCallback(() => {
 		setQuery('');
