@@ -15,7 +15,7 @@
     margin: 0; padding: 0;
     text-align: left;
 
-    z-index: 2;
+    z-index: 3;
 
     max-height: calc(50vh - 110px);
     overflow-y: auto;
