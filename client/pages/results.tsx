@@ -117,7 +117,7 @@ function ResultsPage() {
 		case 'Not Found':
 			return <div className={styles.load}>
 				<h1 style={{ marginBottom: '20px' }}>Coaster Not Found :(</h1>
-				<p>Like Six Flags' corporate strategy, this coaster doesn't seem to exist.</p>
+				<p>Like Six Flags&apos; corporate strategy, this coaster doesn&apos;t seem to exist.</p>
 				<Link href='/contribute/newCoaster'><a className={btnStyle.bigBtn}>Why not add it?</a></Link>
 			</div>;
 		case 'Ready':

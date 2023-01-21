@@ -14,7 +14,7 @@ export default function Custom404() {
 		<main className={styles.main}>
 			<h1 style={{ fontSize: '1000%', margin: 0 }}>404</h1>
 			<h2 style={{ fontSize: '300%' }}>Page Not Found</h2>
-			<p>Like Six Flags' corporate strategy, this page doesn't seem to exist.</p>
+			<p>Like Six Flags&apos; corporate strategy, this page doesn&apos;t seem to exist.</p>
 			<p>Why not try searching for a coaster?</p>
 		</main>
 		<Footer isDark={false} />
