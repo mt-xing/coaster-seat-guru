@@ -7,7 +7,7 @@ import styles from '../styles/Results.module.css';
 export default function Custom404() {
 	return <>
 		<Head>
-			<title>Seat Map - {PRODUCT_NAME}</title>
+			<title>404 - {PRODUCT_NAME}</title>
 			<meta name="description" content="Coaster seat map" />
 		</Head>
 		<Header />
