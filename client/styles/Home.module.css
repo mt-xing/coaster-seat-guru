@@ -200,7 +200,7 @@
 	}
 }
 
-@media (max-width: 800px) {
+@media (max-width: 794px) {
 	.topWrap {
 		padding-top: 75px;
 		padding-bottom: 120px;
@@ -220,6 +220,7 @@
 		width: 100%;
 		border-radius: 50px 50px 50px 0;
 		box-sizing: border-box;
+		font-size: min(26px, 5vw);
 	}
 
 	.bgImg {
