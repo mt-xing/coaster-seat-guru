@@ -47,9 +47,6 @@ const Test: NextPage = () => {
 					<meta name="description" content="See what seats on a roller coaster people prefer, and submit your own preferences. It's like that other trademarked site name, but for roller coasters." />
 				</Head>
 
-				{/* eslint-disable-next-line @next/next/no-img-element */}
-				<img src="/img/fury.jpg" alt="" className={styles.bgImg} />
-
 				<div className={styles.topContent}>
 					<h1 className={styles.title}>
 						{PRODUCT_NAME}
@@ -57,6 +54,9 @@ const Test: NextPage = () => {
 
 					<Search customStyles={styles.search} />
 				</div>
+
+				{/* eslint-disable-next-line @next/next/no-img-element */}
+				<img src="/img/fury.jpg" alt="" className={styles.bgImg} />
 			</div>
 
 			<p className={styles.topText}>
