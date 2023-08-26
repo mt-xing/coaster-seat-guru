@@ -22,9 +22,9 @@ type ListStatus = {
 	list: QueryResponse[]
 };
 
-const fetchUniqueQuery = (() => {
+const [fetchUniqueQuery, invalidateQueries] = (() => {
 	let nonce = 0;
-	return async (
+	return [async (
 		setList: (l: ListStatus) => void,
 		setDebounce: (d: number | null) => void,
 		q: string,
@@ -35,23 +35,23 @@ const fetchUniqueQuery = (() => {
 			setList({ s: 'hidden' });
 			return;
 		}
+		nonce++;
+		const cn = nonce;
 		const result = await fetch(`${API_ENDPOINT}Search?q=${val}`);
 		if (!result.ok) {
 			setList({ s: 'hidden' });
 			return;
 		}
-		nonce++;
-		const cn = nonce;
 		const r = await result.json() as QueryResponse[];
 		if (nonce !== cn) {
 			// Another query got in first; abandon
 			return;
 		}
 		setList({ s: 'displayed', list: r });
-	};
+	}, () => { nonce++; }];
 })();
 
-export default function Search() {
+export default function Search(props: {customStyles?: string}) {
 	const [query, setQuery] = useState('');
 	const [debounce, setDebounce] = useState<number | null>(null);
 	const [list, setList] = useState<ListStatus>({ s: 'hidden' });
@@ -63,6 +63,7 @@ export default function Search() {
 	), [setList, setDebounce]);
 
 	const clearQuery = useCallback(() => {
+		invalidateQueries();
 		setQuery('');
 		setList({ s: 'hidden' });
 	}, []);
@@ -75,6 +76,7 @@ export default function Search() {
 		}
 		const val = q.replace(/[\W_]+/g, '').toLowerCase();
 		if (val === '') {
+			invalidateQueries();
 			setList({ s: 'hidden' });
 			return;
 		}
@@ -117,7 +119,7 @@ export default function Search() {
 	}, [list, clearQuery]);
 
 	return <>
-		<input type='text' placeholder='Search for a coaster' value={query} onChange={changeSearch} className={styles.input} />
+		<input type='text' placeholder='Search for a coaster' value={query} onChange={changeSearch} className={props.customStyles ?? styles.input} />
 		{renderList()}
 	</>;
 }
