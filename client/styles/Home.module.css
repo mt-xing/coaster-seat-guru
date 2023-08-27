@@ -51,6 +51,14 @@
 	line-height: 0.9em;
 }
 
+.searchWrap {
+	width: 80%;
+}
+
+.searchWrap li a {
+	padding-left: 20px;
+}
+
 .search {
 	font-size: 32px;
 	padding: 1em 2em;
@@ -58,7 +66,8 @@
 	border: none;
 	margin: 50px 0 0 0;
 	display: block;
-	width: calc(80% - 128px);
+	width: 100%;
+	box-sizing: border-box;
 	background: #CAF0F8;
 	color: #03045E;
 }
@@ -215,11 +224,13 @@
 		margin: 0;
 		font-size: min(100px, 19vw);
 	}
+
+	.searchWrap {
+		width: 100%;
+	}
 	
 	.search {
-		width: 100%;
 		border-radius: 50px 50px 50px 0;
-		box-sizing: border-box;
 		font-size: min(26px, 5vw);
 	}
 

@@ -5,24 +5,41 @@
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+	background: black;
 }
 
 .img {
-	margin-right: 10px;
-	height: 35px;
+	margin-right: 15px;
+	height: 40px;
+	filter: invert(1);
 }
 
 .h1 {
-	margin: 15px 30px;
-	font-size: 35px;
+	margin: 40px 10%;
+	font-size: 45px;
 	display: inline-block;
+
+	color: #0096C7;
+	background: linear-gradient(45deg, #0096C7 15%, white);
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.h1:hover, .h1:focus-within {
+	background: linear-gradient(45deg, #0096C7 50%, white);
+	background-clip: text;
+}
+
+.h1:active {
+	background: linear-gradient(45deg, #0096C7 15%, white);
+	background-clip: text;
 }
 
 .div {
 	float: right;
 	border: 1px black solid;
 	margin-left: auto;
-	margin-right: 20px;
+	margin-right: 10%;
 }
 
 .a {
@@ -30,9 +47,20 @@
 	color: black;
 }
 
-@media(max-width: 950px) {
+@media(max-width: 1330px) {
+	.h1 {
+		margin-left: 5%;
+		margin-right: 20px;
+	}
+	.div {
+		margin-right: 5%;
+	}
+}
+
+@media(max-width: 1050px) {
 	.header {
 		flex-direction: column;
+		padding-bottom: 30px;
 	}
 
 	.h1 {

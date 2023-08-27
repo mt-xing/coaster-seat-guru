@@ -1,15 +1,26 @@
+.wrap {
+    position: relative;
+    display: block;
+    width: calc(450px - 4em);
+    max-width: calc(90vw - 4em);
+}
+
 .input {
     display: block;
-    padding: 10px 20px;
-    color: black;
-    border: none;
-    width: calc(500px - 40px);
-    max-width: calc(90vw - 40px);
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 18px;
+
+    padding: 1em 2em;
+	border-radius: 3em 3em 3em 0;
+	border: none;
+	background: #CAF0F8;
+	color: #03045E;
 }
 
 .results {
-    width: 450px;
-    max-width: calc(80vw - 40px);
+    width: calc(100% + 40px);
+    box-sizing: border-box;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(5px);
     color: white;
@@ -48,7 +59,7 @@
 
 .results li a {
     text-decoration: none;
-    padding: 10px 20px;
+    padding: 10px 0;
     display: block;
     margin: 15px 0;
     overflow: hidden;

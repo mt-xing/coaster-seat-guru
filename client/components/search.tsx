@@ -13,6 +13,11 @@ type QueryResponse = {
 	id: string, name: string, park: string
 };
 
+type Props = {
+	customStyles?: string,
+	customWrap?: string,
+}
+
 type ListStatus = {
 	s: 'hidden',
 } | {
@@ -51,7 +56,7 @@ const [fetchUniqueQuery, invalidateQueries] = (() => {
 	}, () => { nonce++; }];
 })();
 
-export default function Search(props: {customStyles?: string}) {
+export default function Search(props: Props) {
 	const [query, setQuery] = useState('');
 	const [debounce, setDebounce] = useState<number | null>(null);
 	const [list, setList] = useState<ListStatus>({ s: 'hidden' });
@@ -118,8 +123,8 @@ export default function Search(props: {customStyles?: string}) {
 		}
 	}, [list, clearQuery]);
 
-	return <>
+	return <div className={props.customWrap ? `${styles.wrap} ${props.customWrap}` : styles.wrap}>
 		<input type='text' placeholder='Search for a coaster' value={query} onChange={changeSearch} className={props.customStyles ?? styles.input} />
 		{renderList()}
-	</>;
+	</div>;
 }

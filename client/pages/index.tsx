@@ -52,7 +52,7 @@ const Test: NextPage = () => {
 						{PRODUCT_NAME}
 					</h1>
 
-					<Search customStyles={styles.search} />
+					<Search customStyles={styles.search} customWrap={styles.searchWrap} />
 				</div>
 
 				{/* eslint-disable-next-line @next/next/no-img-element */}
