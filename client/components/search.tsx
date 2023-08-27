@@ -7,7 +7,23 @@ import styles from '../styles/Search.module.css';
 import { assertUnreachable } from '../utils/assert';
 import { API_ENDPOINT } from '../utils/consts';
 
-const DEBOUNCE_TIME = 500;
+const getDebounceTime = (val: string) => {
+	const DEBOUNCE_TIME = 500;
+	switch (val.length) {
+	case 0:
+		return Number.POSITIVE_INFINITY;
+	case 1:
+		return DEBOUNCE_TIME * 4;
+	case 2:
+		return DEBOUNCE_TIME;
+	case 3:
+		return DEBOUNCE_TIME / 2;
+	case 4:
+		return DEBOUNCE_TIME / 5;
+	default:
+		return DEBOUNCE_TIME / 10;
+	}
+};
 
 type QueryResponse = {
 	id: string, name: string, park: string
@@ -86,7 +102,7 @@ export default function Search(props: Props) {
 			return;
 		}
 		setList({ s: 'loading' });
-		setDebounce(window.setTimeout(() => void executeQuery(q), DEBOUNCE_TIME));
+		setDebounce(window.setTimeout(() => void executeQuery(q), getDebounceTime(val)));
 	}, [setQuery, debounce, setDebounce, executeQuery]);
 
 	const renderList = useCallback(() => {
