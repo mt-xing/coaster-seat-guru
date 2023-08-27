@@ -10,7 +10,6 @@ import jwtDecode from 'jwt-decode';
 import { VotePayload } from '@apiTypes/vote';
 import { GetCoasterResponse as QueryResult } from '@apiTypes/getCoaster';
 import { CarShape } from '@apiTypes/cosmos';
-import Footer from '../../components/footer';
 import Header from '../../components/header';
 import { assertUnreachable } from '../../utils/assert';
 import { API_ENDPOINT, CLIENT_ID, PRODUCT_NAME } from '../../utils/consts';
@@ -308,7 +307,6 @@ const Contribute: NextPage = () => (
 		</Head>
 		<Header />
 		<AuthWrapper page={<VotePage />} />
-		<Footer isDark={false} />
 	</>
 );
 

@@ -1,5 +1,4 @@
 import Head from 'next/head';
-import Footer from '../components/footer';
 import Header from '../components/header';
 import { PRODUCT_NAME } from '../utils/consts';
 import styles from '../styles/Results.module.css';
@@ -17,6 +16,5 @@ export default function Custom404() {
 			<p>Like Six Flags&apos; corporate strategy, this page doesn&apos;t seem to exist.</p>
 			<p>Why not try searching for a coaster?</p>
 		</main>
-		<Footer isDark={false} />
 	</>;
 }

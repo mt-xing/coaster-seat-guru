@@ -1,8 +1,10 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
+import Footer from 'components/footer';
+import styles from '../styles/Main.module.css';
 
-function MyApp({ Component, pageProps }: AppProps) {
+function CoasterSeatGuru({ Component, pageProps }: AppProps) {
 	return <>
 		<Head>
 			<meta charSet="UTF-8" />
@@ -16,8 +18,11 @@ function MyApp({ Component, pageProps }: AppProps) {
 			<meta name="msapplication-TileColor" content="#da532c" />
 			<meta name="theme-color" content="#ffffff" />
 		</Head>
-		<Component {...pageProps} />
+		<div className={styles.pageWrap}>
+			<div className={styles.contentWrap}><Component {...pageProps} /></div>
+			<Footer />
+		</div>
 	</>;
 }
 
-export default MyApp;
+export default CoasterSeatGuru;

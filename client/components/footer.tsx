@@ -1,8 +1,8 @@
 import styles from '../styles/Footer.module.css';
 
-export default function Footer(props: {isDark: boolean}) {
+export default function Footer() {
 	return (
-		<footer className={props.isDark ? `${styles.footer} ${styles.dark}` : styles.footer}>
+		<footer className={styles.footer}>
 			<div>
 				<p>
 				A website by <a href='https://michaelxing.com' target='_blank' rel='noreferrer'>Michael Xing</a>,

@@ -10,7 +10,6 @@ import { EditTrainPayload } from '@apiTypes/editTrain';
 import { GetCoasterResponse as QueryResult } from '@apiTypes/getCoaster';
 import TrainEditor from 'components/trainEditor';
 import { CarShape } from '@apiTypes/cosmos';
-import Footer from '../../components/footer';
 import Header from '../../components/header';
 import { assertUnreachable } from '../../utils/assert';
 import { API_ENDPOINT, CLIENT_ID, PRODUCT_NAME } from '../../utils/consts';
@@ -203,7 +202,6 @@ const CoasterTrain: NextPage = () => (
 		</Head>
 		<Header />
 		<AuthWrapper page={<TrainPage />} />
-		<Footer isDark={false} />
 	</>
 );
 
