@@ -99,6 +99,7 @@
 
 .results li:hover p, .results li:focus-within p {
 	color: #CAF0F8;
+	transition: color 0.3s ease-in-out;
 }
 
 .results li p {
@@ -108,7 +109,7 @@
     z-index: 2;
     color: black;
 
-	transition: color 0.4s ease-in-out;
+	transition: color 0.4s ease-in-out 0.2s;
 }
 
 .results li p:last-child {
