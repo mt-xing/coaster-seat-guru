@@ -1,49 +1,233 @@
-.title {
-  margin: 0;
-  font-weight: bold;
+.homeWrap {
+	background: #023E8A;
 
-  font-size: 400%;
-}
-
-.imageContainer {
-	background-image: url('/img/fury.jpg');
-	background-size: cover;
-	background-position: center center;
-  width: 100%;
-  height: 100%;
-  min-height: 100vh;
-}
-
-.container {
-  text-align: center;
-  
-	backdrop-filter: blur(5px) brightness(40%);
-  
 	color: white;
-  width: 100%;
-  height: 100%;
-  min-height: 100vh;
-  
+	font-size: 18px;
+}
+
+.topWrap {
+	padding-top: 150px;
+	padding-bottom: 150px;
+	background: radial-gradient(ellipse at top left, #03045E, black 50%);
+
+	position: relative;
+	
+}
+
+.bgImg {
+	width: 35%;
+	position: absolute;
+	left: 10%;
+	top: 150px;
+	height: calc(100% - 300px);
+	overflow: hidden;
+
+	border-top-left-radius: 100px;
+	border-bottom-left-radius: 100px;
+	border-top-right-radius: 100px;
+
 	display: flex;
-	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+
+	object-fit: cover;
+	object-position: center;
+}
+
+.topContent {
+	padding-left: 50%;
+}
+
+.title {
+	color: #0096C7;
+	background: linear-gradient(45deg, #0096C7 15%, white);
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	margin: 0 20% 0 0;
+	text-align: left;
+	font-size: 130px;
+	max-width: 800px;
+	line-height: 0.9em;
 }
 
 .searchWrap {
-  display: inline-block;
+	width: 80%;
 }
 
-.footer a {
-  color: white;
+.searchWrap li a {
+	padding-left: 20px;
 }
 
-@media(max-width: 700px) {
-  .container {
-    justify-content: flex-start;
-  }
+.search {
+	font-size: 32px;
+	padding: 1em 2em;
+	border-radius: 3em 3em 3em 0;
+	border: none;
+	margin: 50px 0 0 0;
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+	background: #CAF0F8;
+	color: #03045E;
+}
 
-  .container h1 {
-    margin-top: 20vh;
-  }
+.homeWrap p {
+	padding: 0 10%;
+}
+
+.homeWrap .topText {
+	padding-top: 70px;
+	font-size: 22px;
+	padding-bottom: 20px;
+}
+
+.coasterList {
+	display: block;
+	list-style: none;
+	padding: 0 0 100px 0;
+	margin: 0 10%;
+}
+
+.coasterList li {
+	width: calc(100% / 3 - 40px / 3);
+	display: inline-block;
+	margin-right: 20px;
+}
+
+.coasterList li:last-child {
+	margin-right: 0;
+}
+
+.coasterList li span {
+	display: block;
+	margin: 10px 0;
+	font-size: 30px;
+	border-radius: 0 50px;
+	text-align: center;
+
+	position: relative;
+	overflow: hidden;
+}
+
+.coasterList li:nth-child(odd) span {
+	border-radius: 50px 0;
+}
+
+.coasterList li a {
+	z-index: 2;
+	position: relative;
+	text-decoration: none;
+	color: #03045E;
+	padding: 40px 20px;
+	display: block;
+
+	transition: color 0.5s ease-in-out;
+}
+
+.coasterList li span::before, .coasterList li span::after {
+	content: '';
+	position: absolute;
+	top: 0; left: 0; right: 0; bottom: 0;
+}
+
+.coasterList li span::before {
+	background: #CAF0F8;
+	z-index: 0;
+}
+
+.coasterList li span::after {
+	background: #03045E;
+	z-index: 1;
+
+	transition: transform 0.5s ease-in, background 0.3s ease-in-out;
+	transform: translateX(-100%);
+}
+
+.coasterList li:hover span::after, .coasterList li:focus-within span::after {
+	transition: transform 0.4s ease-out, background 0.3s ease-in-out;
+	transform: translateX(0);
+}
+
+.coasterList li:active span::after {
+	transition: transform 0.4s ease-out, background 0.1s ease-in-out;
+	background: black;
+}
+
+.coasterList li:hover a, .coasterList li:focus-within a {
+	color: #CAF0F8;
+}
+
+@media (max-width: 1250px) {
+	.bgImg {
+		width: 25%;
+	}
+
+	.topContent {
+		padding-left: 40%;
+	}
+
+	.title {
+		font-size: 100px;
+	}
+
+	.coasterList li span {
+		font-size: 22px;
+	}
+}
+
+@media (max-width: 900px) {
+	.coasterList li span {
+		font-size: 18px;
+	}
+	
+	.search {
+		font-size: 26px;
+	}
+}
+
+@media (max-width: 794px) {
+	.topWrap {
+		padding-top: 75px;
+		padding-bottom: 120px;
+	}
+
+	.topContent {
+		padding-left: 10%;
+		padding-right: 10%;
+	}
+
+	.title {
+		margin: 0;
+		font-size: min(100px, 19vw);
+	}
+
+	.searchWrap {
+		width: 100%;
+	}
+	
+	.search {
+		border-radius: 50px 50px 50px 0;
+		font-size: min(26px, 5vw);
+	}
+
+	.bgImg {
+		position: static;
+		width: 80%;
+		height: 30vh;
+		margin-left: 10%;
+		margin-top: 30px;
+		border-radius: 0 50px;
+	}
+
+	.coasterList li {
+		width: 100%;
+		display: block;
+		margin-right: 0;
+		box-sizing: border-box;
+	}
+	
+	.coasterList li span, .coasterList li span:nth-child(odd) {
+		border-radius: 50px 50px 50px 0;
+		font-size: 26px;
+	}
 }

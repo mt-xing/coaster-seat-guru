@@ -7,11 +7,32 @@ import styles from '../styles/Search.module.css';
 import { assertUnreachable } from '../utils/assert';
 import { API_ENDPOINT } from '../utils/consts';
 
-const DEBOUNCE_TIME = 500;
+const getDebounceTime = (val: string) => {
+	const DEBOUNCE_TIME = 500;
+	switch (val.length) {
+	case 0:
+		return Number.POSITIVE_INFINITY;
+	case 1:
+		return DEBOUNCE_TIME * 4;
+	case 2:
+		return DEBOUNCE_TIME;
+	case 3:
+		return DEBOUNCE_TIME / 2;
+	case 4:
+		return DEBOUNCE_TIME / 5;
+	default:
+		return DEBOUNCE_TIME / 10;
+	}
+};
 
 type QueryResponse = {
 	id: string, name: string, park: string
 };
+
+type Props = {
+	customStyles?: string,
+	customWrap?: string,
+}
 
 type ListStatus = {
 	s: 'hidden',
@@ -22,9 +43,9 @@ type ListStatus = {
 	list: QueryResponse[]
 };
 
-const fetchUniqueQuery = (() => {
+const [fetchUniqueQuery, invalidateQueries] = (() => {
 	let nonce = 0;
-	return async (
+	return [async (
 		setList: (l: ListStatus) => void,
 		setDebounce: (d: number | null) => void,
 		q: string,
@@ -35,23 +56,23 @@ const fetchUniqueQuery = (() => {
 			setList({ s: 'hidden' });
 			return;
 		}
+		nonce++;
+		const cn = nonce;
 		const result = await fetch(`${API_ENDPOINT}Search?q=${val}`);
 		if (!result.ok) {
 			setList({ s: 'hidden' });
 			return;
 		}
-		nonce++;
-		const cn = nonce;
 		const r = await result.json() as QueryResponse[];
 		if (nonce !== cn) {
 			// Another query got in first; abandon
 			return;
 		}
 		setList({ s: 'displayed', list: r });
-	};
+	}, () => { nonce++; }];
 })();
 
-export default function Search() {
+export default function Search(props: Props) {
 	const [query, setQuery] = useState('');
 	const [debounce, setDebounce] = useState<number | null>(null);
 	const [list, setList] = useState<ListStatus>({ s: 'hidden' });
@@ -63,6 +84,7 @@ export default function Search() {
 	), [setList, setDebounce]);
 
 	const clearQuery = useCallback(() => {
+		invalidateQueries();
 		setQuery('');
 		setList({ s: 'hidden' });
 	}, []);
@@ -75,11 +97,12 @@ export default function Search() {
 		}
 		const val = q.replace(/[\W_]+/g, '').toLowerCase();
 		if (val === '') {
+			invalidateQueries();
 			setList({ s: 'hidden' });
 			return;
 		}
 		setList({ s: 'loading' });
-		setDebounce(window.setTimeout(() => void executeQuery(q), DEBOUNCE_TIME));
+		setDebounce(window.setTimeout(() => void executeQuery(q), getDebounceTime(val)));
 	}, [setQuery, debounce, setDebounce, executeQuery]);
 
 	const renderList = useCallback(() => {
@@ -116,8 +139,8 @@ export default function Search() {
 		}
 	}, [list, clearQuery]);
 
-	return <>
-		<input type='text' placeholder='Search for a coaster' value={query} onChange={changeSearch} className={styles.input} />
+	return <div className={props.customWrap ? `${styles.wrap} ${props.customWrap}` : styles.wrap}>
+		<input type='text' placeholder='Search for a coaster' value={query} onChange={changeSearch} className={props.customStyles ?? styles.input} />
 		{renderList()}
-	</>;
+	</div>;
 }

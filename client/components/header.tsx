@@ -5,9 +5,11 @@ import Search from './search';
 
 import styles from '../styles/Header.module.css';
 
-export default function Header() {
+const noBgStyles = { background: 'none', boxShadow: 'none' };
+
+export default function Header(props: {noBg?: boolean}) {
 	return (
-		<header className={styles.header}>
+		<header className={styles.header} style={props.noBg ? noBgStyles : undefined}>
 			<h1 className={styles.h1}>
 				<Link href='/'>
 					<a className={styles.a}>

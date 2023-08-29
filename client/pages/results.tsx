@@ -7,7 +7,6 @@ import { SyncLoader } from 'react-spinners';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { GetCoasterResponse as QueryResult } from '@apiTypes/getCoaster';
-import Footer from '../components/footer';
 import Header from '../components/header';
 import { assertUnreachable } from '../utils/assert';
 import { API_ENDPOINT, PRODUCT_NAME } from '../utils/consts';
@@ -172,7 +171,6 @@ const Results: NextPage = () => (
 		</Head>
 		<Header />
 		<ResultsPage />
-		<Footer isDark={false} />
 	</>
 );
 

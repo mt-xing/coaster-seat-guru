@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { CreateCoasterPayload } from '@apiTypes/createCoaster';
 import { CarShape } from '@apiTypes/cosmos';
 import TrainEditor from 'components/trainEditor';
-import Footer from '../../components/footer';
 import Header from '../../components/header';
 import { assertUnreachable } from '../../utils/assert';
 import { API_ENDPOINT, CLIENT_ID, PRODUCT_NAME } from '../../utils/consts';
@@ -201,7 +200,6 @@ const SubmitCoaster: NextPage = () => (
 		</Head>
 		<Header />
 		<AuthWrapper page={<SubmitCoasterPage />} />
-		<Footer isDark={false} />
 	</>
 );
 

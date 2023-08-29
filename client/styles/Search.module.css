@@ -1,24 +1,39 @@
+.wrap {
+    position: relative;
+    display: block;
+    width: calc(450px - 4em);
+    max-width: calc(90vw - 4em);
+}
+
 .input {
     display: block;
-    padding: 10px 20px;
-    color: black;
-    border: none;
-    width: calc(500px - 40px);
-    max-width: calc(90vw - 40px);
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 18px;
+
+    padding: 1em 2em;
+	border-radius: 3em 3em 3em 0;
+	border: none;
+	background: #CAF0F8;
+	color: #03045E;
 }
 
 .results {
-    width: 500px;
-    max-width: 90vw;
+    width: calc(100% + 40px);
+    box-sizing: border-box;
     background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
     color: white;
-    margin: 0; padding: 0;
+    margin: 0; padding: 0 20px;
     text-align: left;
 
     z-index: 3;
 
-    max-height: calc(50vh - 110px);
+    max-height: calc(70vh - 110px);
     overflow-y: auto;
+
+    transform: translate(-20px, 5px);
+    border-radius: 0 0 30px 30px;
 
     position: absolute;
 }
@@ -31,7 +46,7 @@
 
 .noResults {
     display: block;
-    padding: 10px 20px;
+    padding: 20px 40px;
     margin: 0;
 }
 
@@ -44,24 +59,57 @@
 
 .results li a {
     text-decoration: none;
-    color: white;
-    padding: 10px 20px;
-    border-bottom: 1px white solid;
+    padding: 10px 0;
     display: block;
+    margin: 15px 0;
+    overflow: hidden;
+    border-radius: 0 20px 20px 20px;
 
-    background: rgba(0, 0, 0, 0);
-    transition: background 0.2s ease-in-out;
+    position: relative;
 }
 
-.results li a:hover {
-    background: rgba(0, 0, 0, 0.5);
+.results li a::before, .results li a::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 0;
 }
-.results li a:active {
-    background: rgba(0, 0, 0, 2);
+
+.results li a::before {
+    z-index: 0;
+    background: #CAF0F8;
+}
+
+.results li a::after {
+	background: #03045E;
+	z-index: 1;
+
+	transition: transform 0.5s ease-in, background 0.3s ease-in-out;
+	transform: translateX(-100%);
+}
+
+.results li:hover a::after, .results li:focus-within a::after {
+	transition: transform 0.4s ease-out, background 0.3s ease-in-out;
+	transform: translateX(0);
+}
+
+.results li:active a::after {
+	transition: transform 0.4s ease-out, background 0.1s ease-in-out;
+	background: black;
+}
+
+.results li:hover p, .results li:focus-within p {
+	color: #CAF0F8;
+	transition: color 0.3s ease-in-out;
 }
 
 .results li p {
     margin: 0;
+    padding: 0 0 0 40px;
+    position: relative;
+    z-index: 2;
+    color: black;
+
+	transition: color 0.4s ease-in-out 0.2s;
 }
 
 .results li p:last-child {
@@ -75,7 +123,7 @@
 
 .results .prompt {
     margin: 0;
-    padding: 10px;
+    padding: 10px 10px 20px 10px;
     font-size: 80%;
     display: block;
 }
