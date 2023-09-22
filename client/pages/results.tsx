@@ -132,7 +132,9 @@ function ResultsPage() {
 							backgroundColor: state.heatmap.colorOfScore(state.data[r][c])
 						}}
 						onClick={() => setSelected(r, c)}
-						className={`${styles.seat}${state.selected?.row === r && state.selected?.col === c ? ` ${styles.selected}` : ''}`}
+						className={`${styles.seat}${
+							state.selected?.row === r && state.selected?.col === c ? ` ${styles.selected}` : ''
+						}`}
 					>
 						<div className={styles.selected} />
 					</button>}
