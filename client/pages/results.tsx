@@ -128,6 +128,7 @@ function ResultsPage() {
 					rows={state.rows}
 					cols={state.cols}
 					render={(r, c) => <button
+						aria-label={`Row ${r + 1}, Seat ${c + 1}`}
 						style={{
 							backgroundColor: state.heatmap.colorOfScore(state.data[r][c])
 						}}
