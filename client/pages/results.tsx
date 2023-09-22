@@ -7,12 +7,11 @@ import { SyncLoader } from 'react-spinners';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { GetCoasterResponse as QueryResult } from '@apiTypes/getCoaster';
+import DisplayTrain from 'components/displayTrain';
 import Header from '../components/header';
 import { assertUnreachable } from '../utils/assert';
 import { API_ENDPOINT, PRODUCT_NAME } from '../utils/consts';
 import styles from '../styles/Results.module.css';
-import btnStyle from '../styles/BigButton.module.css';
-import Train from '../components/train';
 import HeatMap from '../model/heatmap';
 
 type ResultsState = {
@@ -112,48 +111,58 @@ function ResultsPage() {
 	return useCallback(() => {
 		switch (state.s) {
 		case 'Loading':
-			return <div className={styles.load}><SyncLoader /></div>;
+			return <div className={styles.load}><SyncLoader color="white" /></div>;
 		case 'Not Found':
 			return <div className={styles.load}>
 				<h1 style={{ marginBottom: '20px' }}>Coaster Not Found :(</h1>
 				<p>Like Six Flags&apos; corporate strategy, this coaster doesn&apos;t seem to exist.</p>
-				<Link href='/contribute/newCoaster'><a className={btnStyle.bigBtn}>Why not add it?</a></Link>
+				<Link href='/contribute/newCoaster'>Why not add it?</Link>
 			</div>;
 		case 'Ready':
 			if (id === undefined || Array.isArray(id)) {
 				throw new Error();
 			}
 			return <main className={styles.main}>
-				<h1>{state.name}</h1>
-				<h2>{state.park}</h2>
-				<Train
+				<DisplayTrain
+					key={id}
 					rows={state.rows}
 					cols={state.cols}
 					render={(r, c) => <button
-						style={{ backgroundColor: state.heatmap.colorOfScore(state.data[r][c]), margin: '0 5px' }}
+						style={{
+							backgroundColor: state.heatmap.colorOfScore(state.data[r][c])
+						}}
 						onClick={() => setSelected(r, c)}
-					></button>}
+						className={`${styles.seat}${state.selected?.row === r && state.selected?.col === c ? ` ${styles.selected}` : ''}`}
+					>
+						<div className={styles.selected} />
+					</button>}
 					renderGap={blankSeat}
 					carDesign={state.carDesign}
 					spacings={state.spacings}
 					rowsPerCar={state.rowsPerCar}
 				/>
-				<section className={styles.details}>
-					{state.selected === null
-						? <h2>Select a seat to see ratings</h2>
-						: getSelectionDetails(state)
-					}
-					<p className={styles.contactMsg}>
-						If something is wrong with this page,<br />please let me know on <a href='https://github.com/mt-xing/coaster-seat-guru/issues'>GitHub</a>.
-					</p>
-					<Link href={`/contribute?id=${id}`}><a className={`${btnStyle.bigBtn} ${styles.voteBtn}`}>Vote on your favorite seats</a></Link>
+
+				<section className={styles.infoWrap}>
+					<h1>{state.name}</h1>
+					<h2>{state.park}</h2>
+					<Link href={`/contribute?id=${id}`}><a className={styles.voteBtn}>Vote on your favorite seats</a></Link>
 					{
 						!state.carDesign || !state.spacings || !state.rowsPerCar
 							? <p>
 								This coaster is missing train data :(<br />
-								<Link href={`/contribute/coasterTrain?id=${id}`}><a className={`${btnStyle.bigBtn} ${styles.voteBtn}`}>Would you like to add it?</a></Link>
+								<Link href={`/contribute/coasterTrain?id=${id}`}><a className={styles.voteBtn}>Would you like to add it?</a></Link>
 							</p>
 							: null
+					}
+					<p className={styles.contactMsg}>
+						If something is wrong with this page,<br />please let me know on <a href='https://github.com/mt-xing/coaster-seat-guru/issues'>GitHub</a>.
+					</p>
+				</section>
+
+				<section className={styles.detailsWrap}>
+					{state.selected === null
+						? <h2>Select a seat to see ratings</h2>
+						: getSelectionDetails(state)
 					}
 				</section>
 			</main>;
@@ -163,15 +172,19 @@ function ResultsPage() {
 	}, [id, state, setSelected, getSelectionDetails, blankSeat])();
 }
 
-const Results: NextPage = () => (
-	<>
-		<Head>
-			<title>Seat Map - {PRODUCT_NAME}</title>
-			<meta name="description" content="Coaster seat map" />
-		</Head>
-		<Header />
-		<ResultsPage />
-	</>
-);
+const Results: NextPage = () => {
+	const router = useRouter();
+	return (
+		<div className={styles.pageWrap}>
+			<Head>
+				<title>Seat Map - {PRODUCT_NAME}</title>
+				<meta name="description" content="Coaster seat map" />
+				<link rel="canonical" href={`https://coasterseatguru.com/results/?id=${router.query.id?.toString() ?? ''}`} />
+			</Head>
+			<Header noBg={true} />
+			<ResultsPage />
+		</div>
+	);
+};
 
 export default Results;

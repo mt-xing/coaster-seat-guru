@@ -1,7 +1,15 @@
-.main {
-	text-align: center;
+.pageWrap {
+	background: radial-gradient(ellipse at top right, #03045E, black 50%);
+	color: white;
 
     padding-bottom: 100px;
+	flex-grow: 1;
+}
+
+.main {
+	text-align: center;
+	min-height: 400px;
+	position: relative;
 }
 
 .load {
@@ -15,22 +23,17 @@
 	justify-content: center;
 }
 
-.details {
-	display: inline-block;
-	margin-left: 100px;
-	vertical-align: top;
-}
-
-.details table {
+.detailsWrap table {
 	text-align: left;
 	width: 100%;
+	margin-top: 20px;
 }
 
-.details td {
+.detailsWrap td {
 	min-width: 200px;
 }
 
-.details table span {
+.detailsWrap table span {
     display: inline-block;
     height: 1em;
     margin-right: 5px;
@@ -41,6 +44,91 @@
 .voteBtn {
 	margin-top: 10px;
 	display: inline-block;
+}
+
+.seat {
+	margin: 0 5px;
+	width: 35px;
+	height: 35px;
+	border: 3px #023E8A solid;
+	border-radius: 10px 10px 10px 0;
+	cursor: pointer;
+	position: relative;
+	box-sizing: border-box;
+	display: inline-block;
+	vertical-align: top;
+
+	transition: border 0.2s ease-in-out, border-radius 0.25s ease-in-out;
+}
+
+.seat:hover, .seat:focus {
+	border: 3px white solid;
+}
+
+.seat:active, .seat.selected {
+	border: 3px black solid;
+}
+
+.seat.selected {
+	border-radius: 20px;
+}
+
+.seat .selected {
+	position: absolute;
+	left: 0; right: 0; top: 0; bottom: 0;
+	display: block;
+	z-index: 2;
+	pointer-events: none;
+
+	transition: transform 0.01s ease-out 0.2s, opacity 0.2s ease-out;
+	transform: scale(1.5);
+	opacity: 0;
+}
+
+.seat.selected .selected {
+	transform: scale(1);
+	opacity: 1;
+	transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+}
+
+.seat .selected::after {
+	content: '';
+	position: absolute;
+	display: block;
+	top: 0; left: 0; bottom: 0; right: 0;
+	border: 2px #023E8A solid;
+	border-radius: 50%;
+	animation: 1s ease-in-out 0s alternate-reverse infinite pulse;
+	opacity: 0.5;
+}
+
+.infoWrap {
+	background: #023E8A;
+	display: inline-block;
+	padding: 30px 50px;
+	border-radius: 50px 0 50px 50px;
+	box-sizing: border-box;
+
+	vertical-align: top;
+	margin-right: 2vw;
+	max-width: 40vw;
+}
+
+.detailsWrap {
+	background: #CAF0F8;
+	color: black;
+	display: inline-block;
+	padding: 30px 50px;
+	border-radius: 0 50px 50px 50px;
+	box-sizing: border-box;
+
+	vertical-align: top;
+	margin-left: 2vw;
+	max-width: 40vw;
+}
+
+.infoWrap h1, .detailsWrap h2 {
+	margin: 0;
 }
 
 @media (max-width: 700px) {
@@ -74,4 +162,24 @@
 
 .contactMsg a:active {
 	text-decoration: underline;
+}
+
+@keyframes pulse {
+	from {
+		transform: scale(1.8);
+	}
+
+	to {
+		transform: scale(2.1);
+	}
+}
+
+@keyframes circle {
+	from {
+		transform: rotate(0deg);
+	}
+  
+	to {
+		transform: rotate(360deg);
+	}
 }
