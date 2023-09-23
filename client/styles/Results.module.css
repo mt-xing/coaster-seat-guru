@@ -146,6 +146,17 @@
 	opacity: 0.5;
 }
 
+.accessibleScore {
+	transform: rotate(-90deg);
+	display: inline-block;
+}
+
+.accToggle {
+	margin-left: 10px;
+	vertical-align: middle;
+	transform: translateY(-2px);
+}
+
 .infoWrap {
 	background: #023E8A;
 	display: inline-block;
@@ -190,10 +201,6 @@
 		display: inline-block;
 		text-align: left;
 	}
-}
-
-.contactMsg {
-	font-size: 70%;
 }
 
 .contactMsg a {

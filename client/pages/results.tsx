@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { GetCoasterResponse as QueryResult } from '@apiTypes/getCoaster';
 import DisplayTrain from 'components/displayTrain';
+import ReactSwitch from 'react-switch';
 import Header from '../components/header';
 import { assertUnreachable } from '../utils/assert';
 import { API_ENDPOINT, PRODUCT_NAME } from '../utils/consts';
@@ -26,6 +27,22 @@ type ResultsState = {
 
 function ResultsPage() {
 	const [state, setState] = useState<ResultsState>({ s: 'Loading' });
+	const [accessible, setAccessible] = useState<boolean>(false);
+	useEffect(() => {
+		if (typeof window !== 'undefined') {
+			if (localStorage.getItem('accessible') === 'on') {
+				setAccessible(true);
+			}
+		}
+	}, []);
+	const toggleAccessible = useCallback((c: boolean) => {
+		setAccessible(c);
+		if (c) {
+			localStorage.setItem('accessible', 'on');
+		} else {
+			localStorage.removeItem('accessible');
+		}
+	}, []);
 
 	const setSelected = useCallback((r: number, c: number) => {
 		if (state.s !== 'Ready') { return; }
@@ -138,6 +155,10 @@ function ResultsPage() {
 						}`}
 					>
 						<div className={styles.selected} />
+						{accessible ? (
+							<span className={styles.accessibleScore}>{
+								state.heatmap.accessibleScore(state.data[r][c])
+							}</span>) : null}
 					</button>}
 					renderGap={blankSeat}
 					carDesign={state.carDesign}
@@ -174,6 +195,22 @@ function ResultsPage() {
 						</>
 						: null
 				}
+				<div>
+					<label>
+						Having trouble seeing the colors? Try text mode:
+						<ReactSwitch
+							onChange={toggleAccessible}
+							checked={accessible}
+							className={styles.accToggle}
+							onColor='#03045E'
+						/>
+					</label>
+				</div>
+				{
+					accessible ? <p style={{ marginLeft: '50px' }}>
+						++ (beloved), + (liked), ⇎ (controversial), − (disliked), −− (hated)
+					</p> : null
+				}
 				<p className={styles.contactMsg}>
 					If something is wrong with this page, please let me know on <a href='https://github.com/mt-xing/coaster-seat-guru/issues'>GitHub</a>.
 				</p>
@@ -181,7 +218,7 @@ function ResultsPage() {
 		default:
 			return assertUnreachable(state);
 		}
-	}, [id, state, setSelected, getSelectionDetails, blankSeat])();
+	}, [id, state, setSelected, getSelectionDetails, blankSeat, accessible, toggleAccessible])();
 }
 
 const Results: NextPage = () => {
