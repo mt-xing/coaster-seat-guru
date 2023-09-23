@@ -39,7 +39,7 @@ export default function Train(props: TrainProps) {
 			<table className={styles.coasterTrain} ref={wrapRef}>
 				<tbody style={{ padding: '0 35px' }}>
 					{rows.map((r) => <tr key={r}>
-						<td className={styles.legacyRowMarker}>{r + 1}</td>
+						<td className={`${styles.rowMarker} ${styles.legacyRowMarker}`}>{r + 1}</td>
 						{cols.map((c) => <td key={c}>
 							{props.render(r, c)}
 						</td>)}
