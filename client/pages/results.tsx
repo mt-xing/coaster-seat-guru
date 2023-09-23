@@ -122,7 +122,7 @@ function ResultsPage() {
 			if (id === undefined || Array.isArray(id)) {
 				throw new Error();
 			}
-			return <main className={styles.main}>
+			return <><main className={styles.main}>
 				<DisplayTrain
 					key={id}
 					rows={state.rows}
@@ -148,18 +148,6 @@ function ResultsPage() {
 				<section className={styles.infoWrap}>
 					<h1>{state.name}</h1>
 					<h2>{state.park}</h2>
-					<Link href={`/contribute?id=${id}`}><a className={styles.voteBtn}>Vote on your favorite seats</a></Link>
-					{
-						!state.carDesign || !state.spacings || !state.rowsPerCar
-							? <p>
-								This coaster is missing train data :(<br />
-								<Link href={`/contribute/coasterTrain?id=${id}`}><a className={styles.voteBtn}>Would you like to add it?</a></Link>
-							</p>
-							: null
-					}
-					<p className={styles.contactMsg}>
-						If something is wrong with this page,<br />please let me know on <a href='https://github.com/mt-xing/coaster-seat-guru/issues'>GitHub</a>.
-					</p>
 				</section>
 
 				<section className={styles.detailsWrap}>
@@ -168,7 +156,28 @@ function ResultsPage() {
 						: getSelectionDetails(state)
 					}
 				</section>
-			</main>;
+			</main>
+			<div className={styles.bottomWrap}>
+				<p>
+					The seat map above shows the layout,
+					to the best of my knowledge,
+					of {state.name} at {state.park}.
+				</p>
+				<p>{state.total} {state.total === 1 ? 'person has' : 'people have'} voted on this coaster.</p>
+				<p><Link href={`/contribute?id=${id}`}><a className={styles.voteBtn}>Add your opinion too 🢂</a></Link></p>
+				{
+					!state.carDesign || !state.spacings || !state.rowsPerCar
+						? <>
+							<p>Incidentally, I don&apos;t actually know the
+								layout of this coaster&apos;s train :(</p>
+							<p><Link href={`/contribute/coasterTrain?id=${id}`}><a className={styles.voteBtn}>Would you like to add it?</a></Link></p>
+						</>
+						: null
+				}
+				<p className={styles.contactMsg}>
+					If something is wrong with this page, please let me know on <a href='https://github.com/mt-xing/coaster-seat-guru/issues'>GitHub</a>.
+				</p>
+			</div></>;
 		default:
 			return assertUnreachable(state);
 		}

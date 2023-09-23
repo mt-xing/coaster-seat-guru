@@ -35,12 +35,11 @@ export default function Train(props: TrainProps) {
 		rowsPerCar, carDesign, spacings, render, renderGap,
 	} = props;
 	if (rowsPerCar === undefined || carDesign === undefined || spacings === undefined) {
-		return <section className={styles.coaster}>
-			<p>Front of train</p>
-			<table className={styles.coasterTrain}>
-				<tbody>
+		return <section style={computedHeightStyle} className={styles.coaster}>
+			<table className={styles.coasterTrain} ref={wrapRef}>
+				<tbody style={{ padding: '0 35px' }}>
 					{rows.map((r) => <tr key={r}>
-						<td>{r + 1}</td>
+						<td className={styles.legacyRowMarker}>{r + 1}</td>
 						{cols.map((c) => <td key={c}>
 							{props.render(r, c)}
 						</td>)}
