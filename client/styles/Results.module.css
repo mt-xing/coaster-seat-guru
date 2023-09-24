@@ -115,6 +115,7 @@
 .seat.selected {
 	border-radius: 20px;
 	transition: border 0.2s ease-in-out, border-radius 0.2s ease-out;
+	cursor: unset;
 }
 
 .seat .selected {
@@ -243,4 +244,8 @@
 
 .bottomWrap h2 {
 	margin: 0;
+}
+
+.bottomWrap label {
+	cursor: pointer;
 }
