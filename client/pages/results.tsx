@@ -169,6 +169,7 @@ function ResultsPage() {
 				<section className={styles.infoWrap}>
 					<h1>{state.name}</h1>
 					<h2>{state.park}</h2>
+					<p><Link href={`/contribute?id=${id}`}><a className={styles.voteBtn}>Add your vote 🢂</a></Link></p>
 				</section>
 
 				<section className={styles.detailsWrap}>
