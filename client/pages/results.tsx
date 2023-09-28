@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import { GetCoasterResponse as QueryResult } from '@apiTypes/getCoaster';
 import DisplayTrain from 'components/displayTrain';
 import ReactSwitch from 'react-switch';
+import useWindowWidth from 'model/useWindowWidth';
 import Header from '../components/header';
 import { assertUnreachable } from '../utils/assert';
 import { API_ENDPOINT, PRODUCT_NAME } from '../utils/consts';
@@ -24,6 +25,8 @@ type ResultsState = {
 	selected: { row: number, col: number } | null,
 	heatmap: HeatMap,
 } & QueryResult);
+
+const minWrapperWidth = 450;
 
 function ResultsPage() {
 	const [state, setState] = useState<ResultsState>({ s: 'Loading' });
@@ -56,6 +59,10 @@ function ResultsPage() {
 		window.document.title = `N/A - ${PRODUCT_NAME}`;
 		setState({ s: 'Not Found' });
 	}, []);
+
+	const [trainWidth, setTrainWidth] = useState<number | undefined>();
+	const windowWidth = useWindowWidth();
+	const narrowDesign = !!trainWidth && (trainWidth + minWrapperWidth > windowWidth);
 
 	const router = useRouter();
 	const { id } = router.query;
@@ -139,45 +146,52 @@ function ResultsPage() {
 			if (id === undefined || Array.isArray(id)) {
 				throw new Error();
 			}
-			return <><main className={styles.main}>
-				<DisplayTrain
-					key={id}
-					rows={state.rows}
-					cols={state.cols}
-					render={(r, c) => <button
-						aria-label={`Row ${r + 1}, Seat ${c + 1}`}
-						style={{
-							backgroundColor: state.heatmap.colorOfScore(state.data[r][c])
-						}}
-						onClick={() => setSelected(r, c)}
-						className={`${styles.seat}${
-							state.selected?.row === r && state.selected?.col === c ? ` ${styles.selected}` : ''
-						}`}
-					>
-						<div className={styles.selected} />
-						{accessible ? (
-							<span className={styles.accessibleScore}>{
-								state.heatmap.accessibleScore(state.data[r][c])
-							}</span>) : null}
-					</button>}
-					renderGap={blankSeat}
-					carDesign={state.carDesign}
-					spacings={state.spacings}
-					rowsPerCar={state.rowsPerCar}
-				/>
+			return <><main className={`${styles.main} ${trainWidth ? styles.sideTrain : styles.normalTrain}${narrowDesign ? ` ${styles.narrow}` : ''}`}>
+				<div className={styles.trainWrap}>
+					<DisplayTrain
+						key={id}
+						rows={state.rows}
+						cols={state.cols}
+						render={(r, c) => <button
+							aria-label={`Row ${r + 1}, Seat ${c + 1}`}
+							style={{
+								backgroundColor: state.heatmap.colorOfScore(state.data[r][c])
+							}}
+							onClick={() => setSelected(r, c)}
+							className={`${styles.seat}${
+								state.selected?.row === r && state.selected?.col === c ? ` ${styles.selected}` : ''
+							}`}
+						>
+							<div className={styles.selected} />
+							{accessible ? (
+								<span className={styles.accessibleScore}>{
+									state.heatmap.accessibleScore(state.data[r][c])
+								}</span>) : null}
+						</button>}
+						renderGap={blankSeat}
+						carDesign={state.carDesign}
+						spacings={state.spacings}
+						rowsPerCar={state.rowsPerCar}
+						onResizeCallback={setTrainWidth}
+					/>
+				</div>
 
-				<section className={styles.infoWrap}>
-					<h1>{state.name}</h1>
-					<h2>{state.park}</h2>
-					<p><Link href={`/contribute?id=${id}`}><a className={styles.voteBtn}>Add your vote 🢂</a></Link></p>
-				</section>
+				<div className={styles.boxWrap}>
 
-				<section className={styles.detailsWrap}>
-					{state.selected === null
-						? <h2>Select a seat to see ratings</h2>
-						: getSelectionDetails(state)
-					}
-				</section>
+					<section className={styles.infoWrap} lang="en">
+						<h1>{state.name}</h1>
+						<h2>{state.park}</h2>
+						<p><Link href={`/contribute?id=${id}`}><a className={styles.voteBtn}>Add your vote 🢂</a></Link></p>
+					</section>
+
+					<section className={styles.detailsWrap}>
+						{state.selected === null
+							? <h2>Select a seat to see ratings</h2>
+							: getSelectionDetails(state)
+						}
+					</section>
+
+				</div>
 			</main>
 			<div className={styles.bottomWrap}>
 				<p>
@@ -219,7 +233,10 @@ function ResultsPage() {
 		default:
 			return assertUnreachable(state);
 		}
-	}, [id, state, setSelected, getSelectionDetails, blankSeat, accessible, toggleAccessible])();
+	}, [
+		id, state, setSelected, getSelectionDetails, blankSeat, accessible,
+		toggleAccessible, trainWidth, narrowDesign
+	])();
 }
 
 const Results: NextPage = () => {

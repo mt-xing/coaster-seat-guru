@@ -109,10 +109,11 @@
 
 .sideTrain {
 	width: initial;
-	margin-top: 50px;
+	margin-top: 25px;
 	margin-bottom: 50px;
 	overflow: visible;
 	height: unset !important;
+	display: inline-block;
 }
 
 .sideTrain .coasterTrain {

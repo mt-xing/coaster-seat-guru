@@ -1,5 +1,5 @@
 import React, {
-	Fragment, ReactNode, useMemo
+	Fragment, ReactNode, useEffect, useMemo
 } from 'react';
 import { CarShape } from 'model/trainEditorState';
 import useResizeObserver from 'use-resize-observer';
@@ -18,6 +18,8 @@ export type TrainProps = {
 	render: (row: number, seatCol: number) => ReactNode,
 	/** IMPORTANT: Column is indexing total spaces, INCLUDING gaps */
 	renderGap: (row: number, overallCol: number) => ReactNode,
+
+	onResizeCallback?: (width: number | undefined) => void,
 };
 
 export default function Train(props: TrainProps) {
@@ -34,6 +36,14 @@ export default function Train(props: TrainProps) {
 
 	const windowWidth = useWindowWidth();
 	const trainTooBig = useMemo(() => (wrapHeight ?? 0) > windowWidth, [wrapHeight, windowWidth]);
+	const { onResizeCallback } = props;
+	useEffect(() => {
+		if (trainTooBig) {
+			onResizeCallback?.(wrapWidth);
+		} else {
+			onResizeCallback?.(undefined);
+		}
+	}, [wrapWidth, trainTooBig, onResizeCallback]);
 
 	const {
 		rowsPerCar, carDesign, spacings, render, renderGap,

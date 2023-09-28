@@ -159,11 +159,11 @@
 }
 
 .infoWrap {
-	background: #023E8A;
 	display: inline-block;
+	box-sizing: border-box;
 	padding: 30px 50px;
 	border-radius: 50px 0 50px 50px;
-	box-sizing: border-box;
+	background: #023E8A;
 
 	vertical-align: top;
 	margin-right: 2vw;
@@ -252,26 +252,137 @@
 
 
 @media(max-width: 975px) {
-	.infoWrap {
+	.normalTrain {
+		display: grid;
+		grid-template-rows: auto auto auto;
+		grid-template-columns: auto;
+	}
+
+	.normalTrain .boxWrap {
+		display: contents;
+	}
+
+	.normalTrain .infoWrap {
 		display: block;
-		margin: 0 auto;
 		max-width: 70%;
+		margin: 0 auto;
 		border-radius: 50px 50px 50px 0;
+		grid-column: 1;
+		grid-row: 1;
 	}
 	
-	.detailsWrap {
+	.normalTrain .detailsWrap {
 		display: block;
-		margin: 50px auto;
+		margin: -50px auto 0 auto;
 		max-width: 70%;
+		grid-column: 1;
+		grid-row: 3;
+	}
+
+	.normalTrain .trainWrap {
+		grid-row: 2;
+		grid-column: 1;
 	}
 }
 
 @media(max-width: 800px) {
-	.infoWrap {
+	.normalTrain .infoWrap {
 		max-width: 80%;
 	}
 	
-	.detailsWrap {
+	.normalTrain .detailsWrap {
 		max-width: 80%;
 	}
+}
+
+.sideTrain {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-template-rows: auto;
+}
+
+.sideTrain .trainWrap {
+	grid-column: 1;
+	grid-row: 1;
+	padding-left: 5vw;
+}
+
+.sideTrain .boxWrap {
+	grid-column: 2;
+	grid-row: 1;
+	position: sticky;
+	align-self: start;
+	top: 0;
+	text-align: left;
+	padding-top: 50px;
+	padding-bottom: 50px;
+	padding-left: 50px;
+	box-sizing: border-box;
+	max-height: 100vh;
+	overflow-y: auto;
+}
+
+.sideTrain .infoWrap {
+	display: inline-block;
+	text-align: center;
+	margin: 25px 0 0 0;
+	max-width: 85%;
+	width: 85%;
+	border-radius: 50px 50px 50px 0;
+	overflow-wrap: break-word;
+	hyphens: auto;
+}
+
+.sideTrain .detailsWrap {
+	text-align: center;
+	display: inline-block;
+	margin: 50px 0 0 0;
+	max-width: 85%;
+	width: 85%;
+}
+
+.sideTrain .accessibleScore {
+	transform: none;
+}
+
+.sideTrain.narrow {
+	grid-template-columns: auto;
+	grid-template-rows: auto auto auto;
+}
+
+.sideTrain.narrow .trainWrap {
+	grid-column: 1;
+	grid-row: 2;
+	padding-left: 0;
+}
+
+.sideTrain.narrow .boxWrap {
+	display: contents;
+	position: relative;
+	padding: 0;
+	max-height: unset;
+	overflow-y: unset;
+}
+
+.sideTrain.narrow .infoWrap {
+	grid-column: 1;
+	grid-row: 1;
+	margin: 0 auto 50px auto;
+	width: 90%;
+	box-sizing: border-box;
+	display: relative;
+	z-index: 2;
+}
+
+.sideTrain.narrow .detailsWrap {
+	grid-column: 1;
+	grid-row: 3;
+	margin: 0 auto;
+	width: 90%;
+	box-sizing: border-box;
+	position: sticky;
+	bottom: 20px;
+	z-index: 2;
+
+	box-shadow: 0 0 10px 0 black;
 }
