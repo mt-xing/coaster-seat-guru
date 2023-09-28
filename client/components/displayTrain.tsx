@@ -3,6 +3,7 @@ import React, {
 } from 'react';
 import { CarShape } from 'model/trainEditorState';
 import useResizeObserver from 'use-resize-observer';
+import useWindowWidth from 'model/useWindowWidth';
 import styles from '../styles/DisplayTrain.module.css';
 
 export type TrainProps = {
@@ -23,13 +24,16 @@ export default function Train(props: TrainProps) {
 	const rows = useMemo(() => Array.from(Array(props.rows).keys()), [props.rows]);
 	const cols = useMemo(() => Array.from(Array(props.cols).keys()), [props.cols]);
 
-	const { ref: wrapRef, width: wrapWidth } = useResizeObserver<HTMLElement>();
+	const { ref: wrapRef, width: wrapWidth, height: wrapHeight } = useResizeObserver<HTMLElement>();
 	const computedHeightStyle = useMemo(() => {
 		if (wrapWidth) {
 			return { height: `${wrapWidth}px` };
 		}
 		return undefined;
 	}, [wrapWidth]);
+
+	const windowWidth = useWindowWidth();
+	const trainTooBig = useMemo(() => (wrapHeight ?? 0) > windowWidth, [wrapHeight, windowWidth]);
 
 	const {
 		rowsPerCar, carDesign, spacings, render, renderGap,
@@ -49,7 +53,7 @@ export default function Train(props: TrainProps) {
 		</section>;
 	}
 
-	return <section style={computedHeightStyle} className={`${styles.coaster} ${styles.trainEdit}`}>
+	return <section style={computedHeightStyle} className={`${styles.coaster} ${styles.trainEdit}${trainTooBig ? ` ${styles.sideTrain}` : ''}`}>
 		<div className={styles.coasterTrain} ref={wrapRef}>
 			{
 				typeof rowsPerCar === 'number' ? (

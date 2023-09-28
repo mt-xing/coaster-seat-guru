@@ -249,3 +249,29 @@
 .bottomWrap label {
 	cursor: pointer;
 }
+
+
+@media(max-width: 975px) {
+	.infoWrap {
+		display: block;
+		margin: 0 auto;
+		max-width: 70%;
+		border-radius: 50px 50px 50px 0;
+	}
+	
+	.detailsWrap {
+		display: block;
+		margin: 50px auto;
+		max-width: 70%;
+	}
+}
+
+@media(max-width: 800px) {
+	.infoWrap {
+		max-width: 80%;
+	}
+	
+	.detailsWrap {
+		max-width: 80%;
+	}
+}

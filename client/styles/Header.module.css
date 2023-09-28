@@ -56,7 +56,27 @@
 	}
 }
 
-@media(max-width: 1050px) {
+@media(max-width: 975px) {
+	.img {
+		margin-right: 10px;
+		height: 4vw;
+	}
+	.h1 {
+		margin-left: 3%;
+		margin-right: 10px;
+		font-size: 4.2vw;
+	}
+	.div {
+		margin-right: 3%;
+	}
+}
+
+@media(max-width: 800px) {
+	.img {
+		margin-right: 15px;
+		height: 40px;
+	}
+
 	.header {
 		flex-direction: column;
 		padding-bottom: 30px;
@@ -65,6 +85,7 @@
 	.h1 {
 		display: block;
 		text-align: center;
+		font-size: 45px;
 	}
 
 	.div {
