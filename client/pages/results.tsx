@@ -7,12 +7,13 @@ import { SyncLoader } from 'react-spinners';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { GetCoasterResponse as QueryResult } from '@apiTypes/getCoaster';
+import DisplayTrain from 'components/displayTrain';
+import ReactSwitch from 'react-switch';
+import useWindowWidth from 'model/useWindowWidth';
 import Header from '../components/header';
 import { assertUnreachable } from '../utils/assert';
 import { API_ENDPOINT, PRODUCT_NAME } from '../utils/consts';
 import styles from '../styles/Results.module.css';
-import btnStyle from '../styles/BigButton.module.css';
-import Train from '../components/train';
 import HeatMap from '../model/heatmap';
 
 type ResultsState = {
@@ -25,8 +26,26 @@ type ResultsState = {
 	heatmap: HeatMap,
 } & QueryResult);
 
+const minWrapperWidth = 450;
+
 function ResultsPage() {
 	const [state, setState] = useState<ResultsState>({ s: 'Loading' });
+	const [accessible, setAccessible] = useState<boolean>(false);
+	useEffect(() => {
+		if (typeof window !== 'undefined') {
+			if (localStorage.getItem('accessible') === 'on') {
+				setAccessible(true);
+			}
+		}
+	}, []);
+	const toggleAccessible = useCallback((c: boolean) => {
+		setAccessible(c);
+		if (c) {
+			localStorage.setItem('accessible', 'on');
+		} else {
+			localStorage.removeItem('accessible');
+		}
+	}, []);
 
 	const setSelected = useCallback((r: number, c: number) => {
 		if (state.s !== 'Ready') { return; }
@@ -40,6 +59,10 @@ function ResultsPage() {
 		window.document.title = `N/A - ${PRODUCT_NAME}`;
 		setState({ s: 'Not Found' });
 	}, []);
+
+	const [trainWidth, setTrainWidth] = useState<number | undefined>();
+	const windowWidth = useWindowWidth();
+	const narrowDesign = !!trainWidth && (trainWidth + minWrapperWidth > windowWidth);
 
 	const router = useRouter();
 	const { id } = router.query;
@@ -112,66 +135,123 @@ function ResultsPage() {
 	return useCallback(() => {
 		switch (state.s) {
 		case 'Loading':
-			return <div className={styles.load}><SyncLoader /></div>;
+			return <div className={styles.load}><SyncLoader color="white" /></div>;
 		case 'Not Found':
 			return <div className={styles.load}>
 				<h1 style={{ marginBottom: '20px' }}>Coaster Not Found :(</h1>
 				<p>Like Six Flags&apos; corporate strategy, this coaster doesn&apos;t seem to exist.</p>
-				<Link href='/contribute/newCoaster'><a className={btnStyle.bigBtn}>Why not add it?</a></Link>
+				<Link href='/contribute/newCoaster'>Why not add it?</Link>
 			</div>;
 		case 'Ready':
 			if (id === undefined || Array.isArray(id)) {
 				throw new Error();
 			}
-			return <main className={styles.main}>
-				<h1>{state.name}</h1>
-				<h2>{state.park}</h2>
-				<Train
-					rows={state.rows}
-					cols={state.cols}
-					render={(r, c) => <button
-						style={{ backgroundColor: state.heatmap.colorOfScore(state.data[r][c]), margin: '0 5px' }}
-						onClick={() => setSelected(r, c)}
-					></button>}
-					renderGap={blankSeat}
-					carDesign={state.carDesign}
-					spacings={state.spacings}
-					rowsPerCar={state.rowsPerCar}
-				/>
-				<section className={styles.details}>
-					{state.selected === null
-						? <h2>Select a seat to see ratings</h2>
-						: getSelectionDetails(state)
-					}
-					<p className={styles.contactMsg}>
-						If something is wrong with this page,<br />please let me know on <a href='https://github.com/mt-xing/coaster-seat-guru/issues'>GitHub</a>.
-					</p>
-					<Link href={`/contribute?id=${id}`}><a className={`${btnStyle.bigBtn} ${styles.voteBtn}`}>Vote on your favorite seats</a></Link>
-					{
-						!state.carDesign || !state.spacings || !state.rowsPerCar
-							? <p>
-								This coaster is missing train data :(<br />
-								<Link href={`/contribute/coasterTrain?id=${id}`}><a className={`${btnStyle.bigBtn} ${styles.voteBtn}`}>Would you like to add it?</a></Link>
-							</p>
-							: null
-					}
-				</section>
-			</main>;
+			return <><main className={`${styles.main} ${trainWidth ? styles.sideTrain : styles.normalTrain}${narrowDesign ? ` ${styles.narrow}` : ''}`}>
+				<div className={styles.trainWrap}>
+					<DisplayTrain
+						key={id}
+						rows={state.rows}
+						cols={state.cols}
+						render={(r, c) => <button
+							aria-label={`Row ${r + 1}, Seat ${c + 1}`}
+							style={{
+								backgroundColor: state.heatmap.colorOfScore(state.data[r][c])
+							}}
+							onClick={() => setSelected(r, c)}
+							className={`${styles.seat}${
+								state.selected?.row === r && state.selected?.col === c ? ` ${styles.selected}` : ''
+							}`}
+						>
+							<div className={styles.selected} />
+							{accessible ? (
+								<span className={styles.accessibleScore}>{
+									state.heatmap.accessibleScore(state.data[r][c])
+								}</span>) : null}
+						</button>}
+						renderGap={blankSeat}
+						carDesign={state.carDesign}
+						spacings={state.spacings}
+						rowsPerCar={state.rowsPerCar}
+						onResizeCallback={setTrainWidth}
+					/>
+				</div>
+
+				<div className={styles.boxWrap}>
+
+					<section className={styles.infoWrap} lang="en">
+						<h1>{state.name}</h1>
+						<h2>{state.park}</h2>
+						<p><Link href={`/contribute?id=${id}`}><a className={styles.voteBtn}>Add your vote 🢂</a></Link></p>
+					</section>
+
+					<section className={styles.detailsWrap}>
+						{state.selected === null
+							? <h2>Select a seat to see ratings</h2>
+							: getSelectionDetails(state)
+						}
+					</section>
+
+				</div>
+			</main>
+			<div className={styles.bottomWrap}>
+				<p>
+					The seat map above shows the layout,
+					to the best of my knowledge,
+					of {state.name} at {state.park}.
+				</p>
+				<p>{state.total} {state.total === 1 ? 'person has' : 'people have'} voted on this coaster.</p>
+				<p><Link href={`/contribute?id=${id}`}><a className={styles.voteBtn}>Add your opinion too 🢂</a></Link></p>
+				{
+					!state.carDesign || !state.spacings || !state.rowsPerCar
+						? <>
+							<p>Incidentally, I don&apos;t actually know the
+								layout of this coaster&apos;s train :(</p>
+							<p><Link href={`/contribute/coasterTrain?id=${id}`}><a className={styles.voteBtn}>Would you like to add it?</a></Link></p>
+						</>
+						: null
+				}
+				<div>
+					<label>
+						Having trouble seeing the colors? Try text mode:
+						<ReactSwitch
+							onChange={toggleAccessible}
+							checked={accessible}
+							className={styles.accToggle}
+							onColor='#03045E'
+						/>
+					</label>
+				</div>
+				{
+					accessible ? <p style={{ marginLeft: '50px' }}>
+						++ (beloved), + (liked), ⇎ (controversial), − (disliked), −− (hated)
+					</p> : null
+				}
+				<p className={styles.contactMsg}>
+					If something is wrong with this page, please let me know on <a href='https://github.com/mt-xing/coaster-seat-guru/issues'>GitHub</a>.
+				</p>
+			</div></>;
 		default:
 			return assertUnreachable(state);
 		}
-	}, [id, state, setSelected, getSelectionDetails, blankSeat])();
+	}, [
+		id, state, setSelected, getSelectionDetails, blankSeat, accessible,
+		toggleAccessible, trainWidth, narrowDesign
+	])();
 }
 
-const Results: NextPage = () => (
-	<>
-		<Head>
-			<title>Seat Map - {PRODUCT_NAME}</title>
-			<meta name="description" content="Coaster seat map" />
-		</Head>
-		<Header />
-		<ResultsPage />
-	</>
-);
+const Results: NextPage = () => {
+	const router = useRouter();
+	return (
+		<div className={styles.pageWrap}>
+			<Head>
+				<title>Seat Map - {PRODUCT_NAME}</title>
+				<meta name="description" content="Coaster seat map" />
+				<link rel="canonical" href={`https://coasterseatguru.com/results/?id=${router.query.id?.toString() ?? ''}`} />
+			</Head>
+			<Header noBg={true} />
+			<ResultsPage />
+		</div>
+	);
+};
 
 export default Results;

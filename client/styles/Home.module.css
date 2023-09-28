@@ -3,6 +3,7 @@
 
 	color: white;
 	font-size: 18px;
+	flex-grow: 1;
 }
 
 .topWrap {
@@ -203,6 +204,7 @@
 
 	.searchWrap {
 		width: 100%;
+		max-width: initial;
 	}
 	
 	.search {

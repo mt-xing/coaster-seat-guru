@@ -44,6 +44,23 @@ export default class HeatMap {
 		return `rgb(${colors[0]}, ${colors[1]}, ${colors[2]})`;
 	}
 
+	accessibleScore(data: [number, number, number]): string {
+		if (this.maxVotes === 0) { return ''; }
+
+		const weight = HeatMap.weightedScore(data) / this.maxMagnitude;
+		if (Math.abs(weight) < 0.25) {
+			const voteIntensity = Math.min(data[0], data[2]) / (this.maxVotes / 2);
+			const highVoteConcentration = voteIntensity > 0.2;
+			return highVoteConcentration ? '⇎' : '';
+		}
+
+		if (Math.abs(weight) < 0.75) {
+			return weight > 0 ? '+' : '−';
+		}
+
+		return weight > 0 ? '++' : '−−';
+	}
+
 	get maximumVotes() {
 		return this.maxVotes;
 	}
